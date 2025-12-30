@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التصنيف العلمي الشامل لآليات الانتباه (27 نوع)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container" style="max-width: 100%;">
+        <div class="fade-in">
+            <div class="header-section">
+                <h1><span class="emoji-icon">🧠</span> التصنيف العلمي الشامل لآليات الانتباه</h1>
+                <p class="subtitle">
+                    دليل شامل لـ 27 نوعًا من آليات الانتباه في التعلم العميق، مقسم إلى آليات رياضية أساسية، تحسينات تنفيذية، ومعماريات متقدمة
+                </p>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalMechanisms">22</div>
+                    <div class="stat-label">آلية رياضية</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalOptimizations">5</div>
+                    <div class="stat-label">تحسين تنفيذي</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalFound">27</div>
+                    <div class="stat-label">إجمالي الأنواع</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">2025</div>
+                    <div class="stat-label">آخر تحديث</div>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" class="form-control search-input" id="searchInput" placeholder="ابحث في آليات الـ Attention... (مثال: Sparse, Linear, Flash, PyTorch)">
+                <i class="fas fa-search search-icon"></i>
+                <span class="clear-search" id="clearSearch" title="مسح البحث">
+                    <i class="fas fa-times-circle"></i>
+                </span>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">الكل (27)</button>
+                <button class="filter-btn" data-filter="mechanisms">آليات الانتباه (22)</button>
+                <button class="filter-btn" data-filter="optimizations">تحسينات تنفيذية (5)</button>
+                <button class="filter-btn" data-filter="sparse">Sparse Attention (9)</button>
+                <button class="filter-btn" data-filter="basic">أساسي (5)</button>
+                <button class="filter-btn" data-filter="pytorch">PyTorch (3)</button>
+            </div>
+            <!-- جدول 1: آليات الانتباه الرياضية -->
+
+
+            <div class="container___main">
+                <div class="container___main_left">
+                    <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center; margin: 0; padding: 0;">
+                        <span style="display: flex; align-items: center;">
+            <span class="emoji-icon">🧮</span> آليات الانتباه (الصيغ الرياضية - 22 نوع)
+                        </span>
+                        <a href="#" id="openPopup" class="popup-link" style="white-space: nowrap; margin-left: 10px;">
+            تقدر تبص على ال architecture ل GPT 2 بيعتبر أبسط مثال عملي على ال <span style="color: red;">Self Attention + Multi Head Attention</span>
+        </a>
+                    </h2>
+                </div>
+
+
+
+
+            </div>
+
+            <div id="popup" class="popup-overlay">
+                <div class="popup-container">
+                    <iframe id="popupFrame" class="popup-iframe"></iframe>
+                    <button id="closePopup" class="popup-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+                </div>
+            </div>
+
+
+
+            <div class="table-container">
+                <table class="table table-hover" id="mechanismsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الآلية</th>
+                            <th>الوصف العلمي</th>
+                            <th>ليه ال RNN/LSTM بتعاني</th>
+                            <th>الحل المفصل</th>
+                            <th>المشكلة التي تحلها</th>
+                            <th>مراجع / أمثلة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mechanismsBody">
+                        <!-- سيتم ملؤه بواسطة JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- جدول 2: التحسينات التنفيذية والمعماريات -->
+            <h2 class="section-title mt-5"><span class="emoji-icon">⚙️</span> التحسينات التنفيذية والمعماريات المرتبطة (5 أنواع)</h2>
+
+            <div class="table-container">
+                <table class="table table-hover" id="optimizationsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>العنصر</th>
+                            <th>التصنيف الصحيح</th>
+                            <th>الوظيفة / التطبيق</th>
+                            <th>مراجع / أمثلة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="optimizationsBody">
+                        <!-- سيتم ملؤه بواسطة JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="no-results" id="noResults">
+                <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px; display: block; color: #aaa;"></i>
+                <p>لم يتم العثور على نتائج مطابقة للبحث</p>
+                <button class="btn btn-outline-primary mt-3" id="resetSearch">إعادة تعيين البحث والتصفية</button>
+            </div>
+
+            <div class="note-box">
+                <h3><i class="fas fa-lightbulb"></i> ملاحظة علمية مهمة</h3>
+                <ul>
+                    <li>الجدول الأول يحتوي على <strong>22 آلية انتباه رياضية حقيقية</strong> (Attention Formulations)</li>
+                    <li>الجدول الثاني يضم <strong>5 تحسينات تنفيذية ومعماريات</strong> تعتمد على الانتباه لكنها ليست صيغ انتباه بحد ذاتها</li>
+                    <li>تصنيف <strong>Sparse Attention</strong> يشمل: Local, Strided, Global, Random, Block, Fixed Patterns, Top-K, LSH, Clustering (9 أنواع)</li>
+                    <li>التصنيف <strong>PyTorch</strong> يشمل تنفيذات جاهزة في إطار العمل PyTorch وليست آليات رياضية جديدة</li>
+                    <li>جميع الأنواع تهدف لتحسين الكفاءة الحسابية أو الدقة أو إمكانية التفسير في نماذج الانتباه</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>تم تصميم هذا التصنيف للمطورين والباحثين في مجال التعلم العميق والذكاء الاصطناعي</p>
+            <p>يمكن استخدام محتوى هذا الجدول بحرية مع الإشارة إلى المصدر</p>
+            <p>آخر تحديث: ديسمبر 2025 | <a href="#" id="copyLink">نسخ الرابط مع حالة البحث</a></p>
+        </div>
+    </div>
+
+    <div class="copy-notification" id="copyNotification">
+        <i class="fas fa-check-circle"></i> تم نسخ الرابط بنجاح
+    </div>
+
+    <script>
+        const attentionMechanisms = [{
+                "id": 1,
+                "type": "Basic Attention",
+                "description": "الانتباه الأساسي - طريقة تحسين على RNN/LSTM التقليدي لربط كل كلمة بكل الكلمات الأخرى في التسلسل.",
+                "rnnProblem": "RNN/LSTM بتعالج الكلمات واحدة واحدة، فلما يوصل لآخر الجملة بينسى أول الجملة بسبب مشكلة vanishing gradient، وما بيقدرش يربط كلمات بعيدة بسهولة.",
+                "detailedSolution": "Basic Attention بيضيف آلية تخلي كل خطوة في الـdecoder تقدر 'تشوف' كل hidden states للـencoder، بدل ما تعتمد بس على آخر hidden state. العملية تعتمد على ثلاث مكونات رئيسية: Q (Query) من الـdecoder، K (Key) وV (Value) من الـencoder. بيتم حساب تشابه كل Q مع كل K للحصول على weights، والـweights دي بتتطبق على الـV لتكوين context vector لكل خطوة. ده بيخلي النموذج يربط كلمات بعيدة بسهولة ويقلل مشكلة نسيان المعلومات القديمة. ⚠️ ملحوظة: التعقيد عادة O(n*m) حيث n طول الـdecoder و m طول الـencoder، مش كما في self-attention داخل نفس التسلسل.",
+                "problem": "محتاجين ربط كلمات بعيدة عن بعض في التسلسل، خصوصًا في الترجمة أو ملء النصوص الطويلة.",
+                "reference": "التطبيقات الأساسية للانتباه: machine translation, seq2seq tasks, speech recognition.",
+                "category": ["mechanisms", "basic"],
+                "classification": "mechanism",
+                "classificationType": "basic"
+            }, {
+                "id": 2,
+                "type": "Self-Attention",
+                "description": "Q, K, V مأخوذة من نفس التسلسل (نفس المصدر)، تتيح لكل كلمة أن ترى كل الكلمات الأخرى داخل نفس التسلسل في نفس الوقت.",
+                "rnnProblem": "RNN/LSTM بتعالج الكلمات sequential، فبتاخد وقت طويل ومش بتقدر تعمل parallel processing، وكمان صعب عليها تتعامل مع تسلسلات طويلة بسبب vanishing/exploding gradient.",
+                "detailedSolution": "Self-Attention بتحسب علاقة كل كلمة مع كل الكلمات الأخرى في نفس التسلسل باستخدام Q, K, V من نفس المصدر. العملية الأساسية تُعرف بـScaled Dot-Product Attention: <span style='color:green; display: block; direction: ltr; text-align: left;'>Attention(Q,K,V) = softmax(QK<sup>T</sup>/√d<sub>k</sub>)V</span>. هنا <span style='color:green; display: inline-block; direction: ltr;'>√d<sub>k</sub></span> بيستخدم لتقليل احتمال gradient explosion. الميزة الرئيسية: كل الكلمات بتُعالَج **متوازيًا (parallel)**، وبتكون النماذج قادرة على الربط بين أي كلمات مهما كانت المسافة بينهم داخل التسلسل. التعقيد: O(n²) بالنسبة لطول التسلسل n.",
+                "problem": "محتاجين نفهم علاقات كل الكلمات جوه نفس الجملة أو التسلسل في نفس الوقت، وكمان نقدر نعمل parallel processing لتسلسلات طويلة.",
+                "reference": "BERT, GPT, Transformer Encoder, Transformer Decoder",
+                "category": ["mechanisms", "basic"],
+                "classification": "mechanism",
+                "classificationType": "basic"
+            }, {
+                "id": 3,
+                "type": "Multi-Head Attention",
+                "description": "عدة نسخ متوازية من Self-Attention تُسقط على أبعاد مختلفة ثم يتم دمجها، بحيث كل رأس (head) يتعلم نوع مختلف من العلاقات بين الكلمات.",
+                "rnnProblem": "RNN/LSTM بيتعلم نوع واحد من العلاقات فقط بين الكلمات، ومش بيقدر يركز على أكتر من pattern في نفس الوقت، وده بيحد من القدرة على فهم العلاقات المتعددة (syntax, semantics, position).",
+                "detailedSolution": "Multi-Head Attention بيعمل عدة نسخ من Attention (heads) بشكل متوازي، كل واحد بيتعلم نوع مختلف من العلاقات. بعد كده، النواتج بتتجمع عن طريق concat وضربها في مصفوفة وزن W<sup>O</sup>: <span style='color:green; display: block; direction: ltr; text-align: left;'>MultiHead(Q,K,V) = Concat(head₁,...,head<sub>h</sub>)W<sup>O</sup></span> حيث <span style='color:green; display: block; direction: ltr; text-align: left;'>head<sub>i</sub> = Attention(QW<sup>Q</sup><sub>i</sub>, KW<sup>K</sup><sub>i</sub>, VW<sup>V</sup><sub>i</sub>)</span>. كل رأس يلتقط أنماط مختلفة في البيانات (مثلاً التراكيب النحوية، المعاني، الموقع)، مما يزيد من قدرة النموذج على تمثيل العلاقات المعقدة بين الكلمات.",
+                "problem": "محتاجين نفهم أكتر من نوع علاقة بين الكلمات في نفس الوقت، سواء معناها أو موقعها أو العلاقة التركيبية.",
+                "reference": "Transformer (معيار صناعي)، GPT, BERT",
+                "category": ["mechanisms", "basic"],
+                "classification": "mechanism",
+                "classificationType": "basic"
+            }, {
+                "id": 4,
+                "type": "Cross-Attention",
+                "description": "Q مأخوذة من تسلسل (عادة Decoder) وK/V مأخوذة من تسلسل آخر مختلف (عادة Encoder)، لتسمح لكل عنصر في الـDecoder بالنظر لكل عناصر الـEncoder.",
+                "rnnProblem": "في Encoder-Decoder RNN/LSTM التقليدي، الـDecoder غالبًا بيعتمد على آخر hidden state فقط من الـEncoder، وبالتالي بينسى معلومات كثيرة من الـinput الأصلي، خصوصًا للجمل الطويلة.",
+                "detailedSolution": "Cross-Attention بيحل المشكلة دي عن طريق السماح لكل كلمة في الـDecoder بأنها تاخد Q من hidden state الحالي للـDecoder، وK/V من كل hidden states للـEncoder. العملية: كل كلمة في الـDecoder بتحسب العلاقة مع كل الكلمات في الـEncoder وتختار المعلومات الأكثر أهمية. الصيغة الأساسية: <span style='color:green; display: block; direction: ltr; text-align: left;'>CrossAttn(Q<sub>dec</sub>, K<sub>enc</sub>, V<sub>enc</sub>) = softmax(Q<sub>dec</sub>K<sub>enc</sub><sup>T</sup>/√d<sub>k</sub>) V<sub>enc</sub></span>. ده بيسمح للـDecoder بالوصول لكل المعلومات المهمة من الـEncoder مباشرة.",
+                "problem": "نحتاج نربط جملة أو تسلسل بـتسلسل آخر مختلف (مثل الـEncoder-Decoder في الترجمة الآلية أو الـseq2seq tasks).",
+                "reference": "Transformer Decoder, T5, BART، الترجمة الآلية، أي نموذج Encoder-Decoder يعتمد على Attention.",
+                "category": ["mechanisms", "basic"],
+                "classification": "mechanism",
+                "classificationType": "basic"
+            }
+
+
+            ,
+
+
+            {
+                "id": 5,
+                "type": "Causal (Masked) Attention",
+                "description": "قناع ثلاثي سفلي (lower triangular mask) يمنع كل كلمة من رؤية الكلمات المستقبلية في نفس التسلسل، مما يضمن توليد نص خطوة خطوة.",
+                "rnnProblem": "RNN/LSTM بطبيعته causal، أي كل خطوة تعتمد على السابقة فقط، لكنه بطيء جدًا لأنه بيعالج الكلمات sequential وما بيدعم parallel processing.",
+                "detailedSolution": "Causal Attention بيطبق mask مثلثي على الـattention scores قبل الـsoftmax بحيث أي كلمة في position i تشوف فقط positions ≤ i: <span style='color:green; display: block; direction: ltr; text-align: left;'>mask[i,j] = -∞ if j > i</span>. ده يسمح للنموذج بعدم الاطلاع على المستقبل أثناء التدريب أو التوليد، وفي نفس الوقت **يسمح بالـparallel training** على كامل التسلسل بفضل آلية الـSelf-Attention masked.",
+                "problem": "محتاجين توليد نص خطوة خطوة (auto-regressive) من غير ما الكلمة الحالية تبص على الكلمات المستقبلية.",
+                "reference": "GPT series, LLaMA, Transformer Decoder للنمذجة التوليدية، أي نموذج autoregressive.",
+                "category": ["mechanisms", "basic"],
+                "classification": "mechanism",
+                "classificationType": "basic"
+            }, {
+                "id": 6,
+                "type": "Local / Sliding Window Attention",
+                "description": "الانتباه يكون ضمن نافذة محدودة حول كل توكن، بحيث كل كلمة ترى فقط مجموعة محددة من الكلمات القريبة بدل كل التسلسل.",
+                "rnnProblem": "RNN/LSTM بيعالج كل التسلسل بالكامل حتى لو المعلومات المهمة قريبة، وده غير فعال خصوصًا للتسلسلات الطويلة (inefficient).",
+                "detailedSolution": "في Local / Sliding Window Attention، كل token بيشوف فقط نافذة محددة حوله (مثلاً ±256 tokens). ده يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n×w)</span> حيث w حجم النافذة الثابت، مع الحفاظ على السياق المحلي. يمكن دمجه مع global attention لتغطية الـlong-range dependencies إذا احتجنا، مما يعطي توازن بين الكفاءة والقدرة على التعامل مع التسلسلات الطويلة.",
+                "problem": "نحتاج نركز على السياق المحلي بكفاءة عالية، مع تقليل التعقيد الحسابي بالنسبة للتسلسلات الطويلة.",
+                "reference": "Longformer (2020), Sparse Transformer, BigBird",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }
+
+            , {
+                "id": 7,
+                "type": "Strided / Dilated Attention",
+                "description": "الانتباه يتم عبر خطوات متباعدة (كل k توكن)، بحيث كل كلمة ترى كلمات متباعدة بدلاً من كل التسلسل.",
+                "rnnProblem": "RNN/LSTM لازم يمر على كل الـsteps عشان يوصل لمعلومة بعيدة، وده بيضعف gradient ويبطئ التعلم، خصوصًا مع التسلسلات الطويلة.",
+                "detailedSolution": "في Strided / Dilated Attention، كل token يشوف فقط كل k tokens (stride = k) بدلاً من كل الكلمات. ده يسمح للنموذج بالوصول للمسافات البعيدة بتكلفة أقل: <span style='color:green; display: inline-block; direction: ltr;'>O(n²/k)</span>. يمكن استخدام عدة strides مختلفة عبر layers متعددة لتعلم multi-scale patterns، بحيث النموذج يلتقط العلاقات القصيرة والطويلة بكفاءة عالية.",
+                "problem": "نحتاج الوصول إلى كلمات بعيدة في التسلسل بتكلفة أقل من O(n²)، مع الحفاظ على capture للـlong-range dependencies.",
+                "reference": "Sparse Transformer (OpenAI, 2019), Long-Range Transformer",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }
+
+
+            , {
+                "id": 8,
+                "type": "Global Attention",
+                "description": "توكنات محددة (special tokens) قادرة على رؤية كل التسلسل بأكمله، والعكس صحيح، بينما باقي التوكنات تعمل Local Attention.",
+                "rnnProblem": "RNN/LSTM مفيهوش فكرة global tokens، كل المعلومات لازم تمر عبر الـhidden state المضغوط، وده ممكن يضعف أو ينسى المعلومات الطويلة.",
+                "detailedSolution": "في Global Attention، نحدد بعض الـtokens (مثل [CLS] أو أول token في كل paragraph) بحيث تعمل full attention لكل التسلسل، والعكس صحيح: أي كلمة في التسلسل يمكنها التواصل مع هذه الـglobal tokens. ده يجعلها بمثابة global memory متاحة من أي مكان في التسلسل، بينما باقي التوكنات تتعامل ضمن local context فقط، مما يقلل التعقيد الحسابي مقارنة بالـfull attention لكل التوكنات، ويحافظ على القدرة على الوصول إلى معلومات مهمة عبر التسلسل.",
+                "problem": "نحتاج أن بعض الـtokens المهمة ترى كل الكلمات في التسلسل والعكس، مثل حالات الـclassification أو summarization.",
+                "reference": "Longformer (2020), BigBird (2020), أي نموذج sparse attention يستخدم global tokens.",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }, {
+                "id": 8,
+                "type": "Global Attention",
+                "description": "توكنات محددة (special tokens) قادرة على رؤية كل التسلسل بأكمله، والعكس صحيح، بينما باقي التوكنات تعمل Local Attention.",
+                "rnnProblem": "RNN/LSTM مفيهوش فكرة global tokens، كل المعلومات لازم تمر عبر الـhidden state المضغوط، وده ممكن يضعف أو ينسى المعلومات الطويلة.",
+                "detailedSolution": "في Global Attention، نحدد بعض الـtokens (مثل [CLS] أو أول token في كل paragraph) بحيث تعمل full attention لكل التسلسل، والعكس صحيح: أي كلمة في التسلسل يمكنها التواصل مع هذه الـglobal tokens. ده يجعلها بمثابة global memory متاحة من أي مكان في التسلسل، بينما باقي التوكنات تتعامل ضمن local context فقط، مما يقلل التعقيد الحسابي مقارنة بالـfull attention لكل التوكنات، ويحافظ على القدرة على الوصول إلى معلومات مهمة عبر التسلسل.",
+                "problem": "نحتاج أن بعض الـtokens المهمة ترى كل الكلمات في التسلسل والعكس، مثل حالات الـclassification أو summarization.",
+                "reference": "Longformer (2020), BigBird (2020), أي نموذج sparse attention يستخدم global tokens.",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }
+
+
+            , {
+                "id": 9,
+                "type": "Random Attention",
+                "description": "كل توكن يختار عدد ثابت من التوكنات الأخرى بشكل عشوائي للانتباه إليها، لتوفير تنوع وتغطية إضافية في المعلومات.",
+                "rnnProblem": "RNN/LSTM بيتبع نفس المسار دائمًا أثناء معالجة التسلسل، وما بيحتويش على randomness طبيعي، وده ممكن يقلل التعميم ويزيد overfitting للـpatterns المحددة.",
+                "detailedSolution": "في Random Attention، كل token يختار r tokens عشوائية للانتباه إليها باستخدام random sampling مع fixed seed لضمان reproducibility. ده بيكسر التماثل بين المسارات المختلفة، يمنع overfitting، ويسمح للمعلومات بالانتشار عبر network عبر مسارات متنوعة. يمكن دمجه مع Local أو Global Attention لتغطية كل التسلسل بكفاءة مع إضافة diversity.",
+                "problem": "نحتاج إضافة diversity للانتباه ومنع overfitting للـpatterns المحددة، مع تحسين انتشار المعلومات عبر الشبكة.",
+                "reference": "BigBird (2020), Sparse Transformer, أي نموذج Sparse Attention يستخدم random connections.",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }
+
+
+            , {
+                "id": 10,
+                "type": "Block / Chunked Attention",
+                "description": "تقسيم التسلسل إلى كتل (blocks) والانتباه داخل كل block وبين الكتل المجاورة، لتقليل التعقيد مع الحفاظ على السياق المحلي والمتجاور.",
+                "rnnProblem": "RNN/LSTM بيعالج التسلسل كله خطوة خطوة، وده بيصعب التعامل مع sequences طويلة جدًا ويزيد الوقت اللازم للحساب.",
+                "detailedSolution": "في Block / Chunked Attention، نقسم الـsequence إلى blocks (مثلاً كل block = 64 tokens). نقوم بعمل attention داخل كل block بالإضافة إلى attention بين blocks المجاورة لضمان continuity. هذا يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n²/b)</span> حيث b حجم block. يمكن استخدام blocks متداخلة (overlapping) لضمان عدم فقدان السياق عند الحدود بين blocks.",
+                "problem": "نحتاج معالجة sequences طويلة بكفاءة عن طريق تقسيمها إلى كتل مع الحفاظ على الربط بين الكلمات المتجاورة.",
+                "reference": "BigBird (2020), Block-Sparse Attention, Long-Range Transformers",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }
+
+
+            , {
+                "id": 11,
+                "type": "Fixed Patterns Attention",
+                "description": "استخدام أنماط انتباه ثابتة محددة مسبقًا (مثل الصفوف، الأعمدة، أو الأقطار) لاستغلال البنية الطبيعية للبيانات المنظمة هندسياً.",
+                "rnnProblem": "RNN/LSTM مش قادر يستفيد من البنية الهندسية للبيانات (مثل الصور 2D أو الجداول)، لأنه يعالج التسلسل بشكل linear فقط ويضيع المعلومات الهيكلية.",
+                "detailedSolution": "في Fixed Patterns Attention، نحدد patterns محددة مسبقًا مثل: \n- row attention: كل عنصر يشوف العناصر في نفس الصف\n- column attention: كل عنصر يشوف العناصر في نفس العمود\n- diagonal attention: كل عنصر يشوف العناصر على القطر\nهذه الأنماط تستغل البنية الطبيعية للبيانات المنظمة، وتقلل التعقيد الحسابي بشكل كبير مقارنة بالـfull attention لجميع العناصر، مع الحفاظ على المعلومات الهيكلية المهمة.",
+                "problem": "نحتاج استخدام patterns ثابتة محددة مسبقًا لتقليل التعقيد الحسابي (sparsity) والاستفادة من البنية الهندسية للبيانات.",
+                "reference": "Sparse Transformer (OpenAI, 2019), Long-Range Sparse Transformers",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }, {
+                "id": 12,
+                "type": "Sparse Top-K Attention",
+                "description": "كل token يركز على أعلى K قيم من attention scores فقط بشكل ديناميكي، مما يقلل الحسابات ويركز على العناصر الأهم.",
+                "rnnProblem": "RNN/LSTM بيدي نفس الاهتمام لكل الـsteps، ومش بيركز على أهم العناصر في التسلسل، مما يقلل الكفاءة خصوصًا للتسلسلات الطويلة.",
+                "detailedSolution": "في Sparse Top-K Attention، نحسب كل attention scores أولاً، ثم نأخذ فقط أعلى K قيم ونضع باقي القيم = 0 قبل تطبيق softmax. هذا يسمح للنموذج بالتركيز على أهم K tokens بشكل adaptive حسب محتوى التسلسل. ⚠️ للـbackward pass، يمكن استخدام straight-through estimator أو softmax مع temperature للحفاظ على differentiability أثناء التدريب.",
+                "problem": "نحتاج تقليل الحسابات على التسلسل الطويل والتركيز فقط على أهم الكلمات أو العناصر في الـsequence.",
+                "reference": "Top-K Sparse Attention (Adaptive Sparsity), Long-Range Transformers",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }, {
+                "id": 13,
+                "type": "LSH (Locality Sensitive Hashing) Attention",
+                "description": "تقريب التشابه بين التوكنات عبر hashing لتجميع التوكنات المتشابهة معًا، بحيث يتم عمل attention فقط ضمن التوكنات المتشابهة.",
+                "rnnProblem": "RNN/LSTM لازم يعالج كل التسلسل خطوة خطوة، حتى لو فيه tokens متشابهة يمكن تجميعهم، مما يزيد الوقت والتعقيد الحسابي مع التسلسلات الطويلة.",
+                "detailedSolution": "في LSH Attention، نستخدم Locality Sensitive Hashing لتحويل الـqueries والـkeys إلى hash buckets. التوكنات التي تقع في نفس الـbucket أو في buckets مجاورة تقوم بعمل attention مع بعضها فقط. هذا يقلل التعقيد الحسابي من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n log n)</span> في المتوسط، مع الحفاظ على قدرة النموذج على التركيز على التوكنات المتشابهة بشكل فعال.",
+                "problem": "نحتاج العثور على التوكنات المتشابهة بسرعة والعمل عليها فقط، لتسريع الانتباه في التسلسلات الطويلة.",
+                "reference": "Reformer (Kitaev et al., 2020), Long-Range Transformers",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }, {
+                "id": 14,
+                "type": "Clustering-Based Attention",
+                "description": "تجميع التوكنات المتشابهة معًا (semantically) والانتباه داخل كل مجموعة (cluster) لتقليل الحسابات مع الحفاظ على تمثيل العلاقات المهمة.",
+                "rnnProblem": "RNN/LSTM مش قادر يجمع tokens متشابهة semantically، لأنه يعالج التسلسل خطوة خطوة وما بيستفيد من البنية الدلالية بين الكلمات.",
+                "detailedSolution": "في Clustering-Based Attention، نستخدم soft clustering على keys/queries باستخدام learnable cluster centers. كل cluster يعمل attention داخليًا (internal attention)، ويمكن إضافة cross-cluster attention محدود إذا احتجنا لربط المعلومات بين المجموعات. soft assignment يُنفذ عادةً باستخدام Gumbel-Softmax أو تقنيات مشابهة لضمان differentiability أثناء التدريب، بدل hard K-means assignment. هذا يقلل التعقيد الحسابي ويعطي قدرة النموذج على التركيز على التوكنات المتشابهة semantically.",
+                "problem": "نحتاج تجميع tokens متشابهة semantically والانتباه داخل كل مجموعة لتقليل الحسابات وتحسين التعلم.",
+                "reference": "Clustered Attention, Routing Transformers (2020), Long-Range Transformers",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }, {
+                "id": 15,
+                "type": "Axial Attention",
+                "description": "انتباه يُطبق على كل بعد من أبعاد البيانات بشكل منفصل، لاستغلال البنية متعددة الأبعاد دون زيادة كبيرة في التعقيد الحسابي.",
+                "rnnProblem": "RNN/LSTM مش مصمم للتعامل مع البيانات متعددة الأبعاد، عادة بيحولها إلى 1D sequence وبالتالي بيضيع البنية المكانية أو الزمنية للبيانات.",
+                "detailedSolution": "في Axial Attention، نطبق الانتباه على كل بعد من أبعاد البيانات بشكل منفصل. مثال للصور (H×W): بدل عمل attention على كل الـpixels مرة واحدة (O(H²W²))، نقوم أولاً بالـattention على كل row (O(HW²)) ثم على كل column (O(H²W)). بذلك يصبح التعقيد الكلي <span style='color:green; display: inline-block; direction: ltr;'>O(HW(H+W))</span> بدل O(H²W²). نفس الفكرة يمكن تطبيقها على بيانات 3D (مثل الفيديو) بحيث نطبق attention على time×height×width بشكل منفصل لكل بعد.",
+                "problem": "نحتاج معالجة بيانات متعددة الأبعاد (صور، فيديو، أو أي tensor عالي الأبعاد) بكفاءة مع الحفاظ على العلاقات المكانية أو الزمنية.",
+                "reference": "Axial Transformer (Ho et al., 2019), Axial-DeepLab",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            }, {
+                "id": 16,
+                "type": "Hierarchical Attention",
+                "description": "انتباه متعدد المستويات (coarse-to-fine) يسمح للنموذج بالتركيز على السياق العالمي والجزئيات المحلية في نفس الوقت.",
+                "rnnProblem": "RNN/LSTM بيعالج كل tokens بنفس المستوى، وما بيقدرش يمثل hierarchy أو مستويات مختلفة من التجريد داخل النص أو البيانات الطويلة.",
+                "detailedSolution": "في Hierarchical Attention، نقسم البيانات أو النصوص إلى مستويات: \n- أول مستوى: chunks كبيرة (document-level) لتحديد السياق العام.\n- ثاني مستوى: paragraphs لتحديد السياق المتوسط.\n- ثالث مستوى: sentences أو tokens لتحديد التفاصيل الدقيقة.\nبهذا الشكل، يمكن للنموذج رؤية الـglobal context والـlocal details في نفس الوقت باستخدام بنية هرمية، مما يحسن القدرة على تمثيل المعلومات الطويلة والمعقدة.",
+                "problem": "نحتاج أن يكون الانتباه على مستويات مختلفة من التجريد، بحيث نستفيد من السياق العالمي والجزئيات المحلية معًا.",
+                "reference": "Hierarchical Attention Networks (Yang et al., 2016), multi-level attention models",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            }
+
+
+            , {
+                "id": 17,
+                "type": "Learnable Sparse Patterns",
+                "description": "تعلم أنماط التناثر (sparsity) أثناء التدريب بطريقة قابلة للاشتقاق، بحيث يقرر النموذج بنفسه أي الـconnections يجب أن تكون فعالة وأيها تُعطَّل.",
+                "rnnProblem": "RNN/LSTM مش sparse بطبيعته، بيعالج كل العناصر في التسلسل بنفس الطريقة ولا يميز بين المهم وغير المهم، مما يزيد التعقيد الحسابي ويحد من الكفاءة.",
+                "detailedSolution": "في Learnable Sparse Patterns، نضيف learnable mask parameters على مصفوفة الـattention. خلال التدريب، الـmask يتعلم أن يجعل بعض الـconnections = 0 لتقليل التعقيد والتركيز على العلاقات المهمة. يتم استخدام Gumbel-Softmax أو Concrete distribution لضمان differentiability، ويمكن إضافة L0 regularization لتشجيع sparsity. بهذه الطريقة، الـsparsity pattern نفسه يتعلم من البيانات بطريقة adaptive وفعالة.",
+                "problem": "نحتاج أن يتعلم النموذج نفسه أنماط sparsity المناسبة من البيانات، بدل تحديدها يدوياً.",
+                "reference": "Dynamic Sparse Attention, Differentiable Masking, Learnable Sparse Transformers",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "sparse"
+            }
+
+
+            , {
+                "id": 18,
+                "type": "Linear Attention",
+                "description": "استخدام Kernel Trick لتحويل التعقيد الحسابي من O(n²) إلى خطي O(n)، مع الحفاظ على القدرة على parallel processing.",
+                "rnnProblem": "RNN/LSTM خطي O(n) لكن sequential، بينما Self-Attention التقليدي O(n²) لكنه parallelizable، لذلك نحتاج مزيج من كفاءة الـRNN وخواص الـAttention.",
+                "detailedSolution": "في Linear Attention، نستخدم kernel trick: <span style='color:green; display: block; direction: ltr; text-align: left;'>φ(Q)(φ(K)<sup>T</sup>V)</span> بدل <span style='color:green; display: block; direction: ltr; text-align: left;'>(QK<sup>T</sup>)V</span>. أولاً نحسب (φ(K)<sup>T</sup>V) بتعقيد O(nd²)، ثم نضرب φ(Q) في النتيجة O(nd²). بالتالي يصبح التعقيد الكلي <span style='color:green; display: inline-block; direction: ltr;'>O(nd²) ≈ O(n)</span> للـd ثابت، مع إمكانية parallel processing على كامل التسلسل، مما يجمع بين السرعة والكفاءة الحسابية.",
+                "problem": "نحتاج تقليل التعقيد من O(n²) إلى O(n) مع الاحتفاظ بالقدرة على parallel processing في تسلسلات طويلة.",
+                "reference": "Linear Transformer (Katharopoulos et al., 2020), Kernel-based Attention, Efficient Transformers",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            },
+
+            {
+                "id": 19,
+                "type": "Performer Attention",
+                "description": "تقريب Self-Attention باستخدام Random Feature Mapping (FAVOR+) لتقليل التعقيد الحسابي مع الحفاظ على دقة عالية.",
+                "rnnProblem": "RNN/LSTM تواجه نفس المشكلة: sequential processing أو Self-Attention التقليدي O(n²)، مما يصعب التعامل مع sequences طويلة جدًا.",
+                "detailedSolution": "في Performer Attention، نستخدم random Fourier features عبر FAVOR+ algorithm لتقريب softmax kernel: <span style='color:green; display: block; direction: ltr; text-align: left;'>softmax(QK<sup>T</sup>/√d) ≈ φ(Q)φ(K)<sup>T</sup></span> حيث φ هي positive random features. هذا يسمح بحساب attention بتعقيد O(n) بدل O(n²)، مع الحفاظ على unbiased approximation للـsoftmax attention، وبالتالي يمكن التعامل مع sequences طويلة جدًا بكفاءة عالية.",
+                "problem": "نحتاج scalable Self-Attention لتسلسلات طويلة جدًا مع الحفاظ على دقة الـsoftmax التقليدية.",
+                "reference": "Performer (Choromanski et al., 2021), FAVOR+ algorithm, Efficient Transformers",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            },
+
+
+
+            {
+                "id": 20,
+                "type": "Relative Positional Attention",
+                "description": "إضافة تحيز يعتمد على المسافة النسبية بين التوكنات، بحيث يتمكن النموذج من التعلم بناءً على المسافة بين الكلمات بدل الـabsolute positions فقط.",
+                "rnnProblem": "RNN/LSTM عنده معلومات positional ضمنية لأنه sequential، لكن مع مرور الوقت (long sequences) هذه المعلومات بتضعف أو تُنسى، خصوصًا للسياق الطويل.",
+                "detailedSolution": "في Relative Positional Attention، بدل استخدام absolute position embeddings، نضيف bias على attention scores حسب المسافة النسبية بين التوكنات (i-j): <span style='color:green; display: block; direction: ltr; text-align: left;'>score<sub>ij</sub> = q<sub>i</sub>·k<sub>j</sub> + q<sub>i</sub>·r<sub>(i-j)</sub></span> حيث r هو تمثيل learnable للمسافة النسبية. هذا يسمح للنموذج بتعلم patterns تعتمد على المسافة النسبية بين الكلمات وليس على الموضع المطلق فقط، مما يحسن generalization على sequences طويلة ويعزز فهم التسلسل.",
+                "problem": "نحتاج تمثيل الترتيب النسبي للكلمات بشكل أفضل من absolute positions، خصوصًا للتسلسلات الطويلة.",
+                "reference": "Transformer-XL (Dai et al., 2019), T5, relative positional embeddings in Transformers",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            }
+
+
+            ,
+
+            {
+                "id": 21,
+                "type": "Sparsemax Attention",
+                "description": "بديل للـSoftmax يولد توزيع attention متناثر يحتوي على أصفار حقيقية، بحيث يركز النموذج على أهم التوكنات فقط.",
+                "rnnProblem": "في حال استخدام RNN attention، عادة يُستخدم Softmax الذي يعطي probabilities > 0 لكل عنصر، حتى غير المهم، مما يجعل التركيز أقل وضوحًا ويقلل interpretability.",
+                "detailedSolution": "Sparsemax يقوم بعمل Euclidean projection على simplex مشابه لـSoftmax، لكنه ينتج output متناثر (sparse) يحتوي على exact zeros. هذا يعني أن النموذج يركز فقط على أهم tokens ويضع الـattention على الباقي = 0 فعلًا، وليس مجرد قيمة صغيرة. ⚠️ الحسابات أبطأ من Softmax التقليدي، لكن يعطي interpretability أعلى ويسمح بتحديد الكلمات الأكثر أهمية بوضوح.",
+                "problem": "نحتاج اختيار أهم الكلمات فقط في التسلسل والتجاهل الصريح للباقي، لتحسين interpretability والفعالية الحسابية.",
+                "reference": "Sparsemax (Martins & Astudillo, 2016), Sparse Attention Mechanisms",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            },
+
+
+
+
+
+            {
+                "id": 22,
+                "type": "Grouped Query Attention (GQA)",
+                "description": "مشاركة K/V بين مجموعات من الـqueries، كحل وسط بين Multi-Head Attention التقليدي (MHA) وMulti-Query Attention (MQA)، لتقليل الذاكرة والحسابات.",
+                "rnnProblem": "مش مشكلة في RNN، ده optimization خاص بالـMulti-Head Attention في Transformers لتقليل الذاكرة والـcompute.",
+                "detailedSolution": "في GQA، بدل أن يكون لكل head K,V منفصل (MHA) أو كل الـheads يشاركوا نفس K,V (MQA)، نقسم الـheads إلى مجموعات وكل مجموعة تشارك نفس K,V. مثال: 32 heads و4 groups → 8 K/V pairs بدل 32، ما يوفر حوالي 70% من الذاكرة في KV cache مع الحفاظ على جودة الأداء قريبة جدًا من MHA. هذا يقلل بشكل كبير memory footprint وcompute مع الحفاظ على القدرة على parallel processing لكل head group.",
+                "problem": "نحتاج تقليل استهلاك الذاكرة والحسابات في Multi-Head Attention مع الحفاظ على جودة الأداء.",
+                "reference": "GQA (Ainslie et al., 2023), Llama 2, Mistral, Efficient Multi-Head Attention",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            }
+
+            ,
+
+
+            {
+                "id": 23,
+                "type": "Cross-Attention with Latents (Perceiver)",
+                "description": "ضغط التسلسل الطويل لعدد صغير من latent tokens ثم تطبيق attention عليهم، لتقليل التعقيد الحسابي مع الحفاظ على المعلومات المهمة.",
+                "rnnProblem": "RNN/LSTM بيضغط كل الـsequence في hidden state واحد فقط، مما يؤدي لفقدان كمية كبيرة من المعلومات عند sequences طويلة جدًا.",
+                "detailedSolution": "في Perceiver، نستخدم cross-attention لضغط sequence طويل (n tokens) إلى عدد صغير من latent tokens (m << n). بعد ذلك، نقوم بعمل self-attention فقط على الـlatents، ثم cross-attention لإرجاع المعلومات للـsequence الأصلي إذا لزم الأمر. هذا يقلل التعقيد الحسابي من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(nm + m²)</span>. مثال: n=100,000 وm=512 → توفير هائل في الحسابات والذاكرة مع الحفاظ على دقة التمثيل.",
+                "problem": "نحتاج ضغط sequences طويلة جدًا إلى تمثيل compact وefficient دون فقدان المعلومات المهمة.",
+                "reference": "Perceiver, Perceiver IO (Jaegle et al., 2021), Efficient Attention for Long Sequences",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            }, {
+                "id": 24,
+                "type": "RoPE (Rotary Position Embedding)",
+                "description": "تمثيل الموضع عبر تدوير الـQ وK في الفضاء المركب بحيث تعتمد الـattention على المسافة النسبية بشكل طبيعي.",
+                "rnnProblem": "RNN/LSTM عنده positional info ضمنية لأنه sequential، لكنها تضيع مع التسلسلات الطويلة، بينما learned absolute embeddings غير قابلة للتعميم (extrapolation) إلى sequences أطول من التدريب.",
+                "detailedSolution": "في RoPE، نطبق rotation matrix على Q وK وفقًا للموضع: <span style='color:green; display: block; direction: ltr; text-align: left;'>f(x,m) = x·e<sup>imθ</sup></span> في الفضاء المركب. نتيجة ذلك، الـinner product بين Q وK يعكس المسافة النسبية بين التوكنات بشكل طبيعي. المميزات: \n- يدعم extrapolation لتسلسلات أطول من التدريب\n- لا يحتاج parameters إضافية\n- يحقق natural decay مع زيادة المسافة بين التوكنات\n- يحافظ على قدرة النموذج على التعامل مع sequences طويلة بكفاءة",
+                "problem": "نحتاج position encoding يعمل مع sequences أطول من التي تم تدريب النموذج عليها دون فقدان المعلومات.",
+                "reference": "RoFormer (Su et al., 2021), LLaMA, GPT-NeoX, Rotary Position Embeddings",
+                "category": ["mechanisms", "positional"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            },
+
+            {
+                "id": 25,
+                "type": "ALiBi (Attention with Linear Biases)",
+                "description": "إضافة bias خطي بسيط على attention scores حسب المسافة بين التوكنات، بدون استخدام position embeddings تقليدية.",
+                "rnnProblem": "Position embeddings التقليدية تضيف parameters جديدة وصعب extrapolation لتسلسلات أطول من التدريب، بينما RNN لديها معلومات موضعية ضمنية لكنها تضيع مع الـtime.",
+                "detailedSolution": "في ALiBi، بدل position embeddings، نضيف bias خطي لكل pair من التوكنات: <span style='color:green; display: block; direction: ltr; text-align: left;'>score<sub>ij</sub> = q<sub>i</sub>·k<sub>j</sub> - m·|i-j|</span> حيث m هو slope مختلف لكل head. هذا يتيح: \n- عدم الحاجة لأي parameters إضافية\n- دعم extrapolation ممتاز لتسلسلات أطول بكثير من التدريب\n- الحفاظ على simplicity وسرعة الحسابات\nيعمل bias الخطي على تفضيل الانتباه للكلمات الأقرب نسبيًا، مما يحسن generalization دون زيادة حجم النموذج.",
+                "problem": "نحتاج position encoding بسيط جداً، سريع، وقابل للتوسع لتسلسلات أطول من التدريب.",
+                "reference": "ALiBi (Press et al., 2022), BLOOM, MPT, Linear Biases for Transformers",
+                "category": ["mechanisms", "positional"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            },
+
+
+            {
+                "id": 26,
+                "type": "Multi-Query Attention (MQA)",
+                "description": "جميع الـheads تشارك نفس K وV، وهي حالة خاصة من GQA، لتقليل استهلاك الذاكرة وتسريع inference.",
+                "rnnProblem": "مش مشكلة في RNN، هذا optimization خاص بالـMulti-Head Attention لتقليل KV cache memory أثناء inference.",
+                "detailedSolution": "في MQA، بدل أن يكون لكل head K,V منفصل، كل الـheads تشترك في single K,V pair واحد. هذا يوفر memory كبير في KV cache (~95%) ويسرع inference بشكل ملحوظ. العيب أنه قد يكون هناك تراجع طفيف في الجودة مقارنة بـMHA، لكن يمكن تعويض ذلك بزيادة dimensionality للـK (d<sub>k</sub>) إذا لزم الأمر. مناسب جدًا للنماذج الكبيرة عند الحاجة إلى decoding سريع على sequences طويلة.",
+                "problem": "نحتاج تقليل KV cache memory بشكل كبير لتسريع inference على sequences طويلة.",
+                "reference": "Fast Transformer Decoding (Shazeer, 2019), PaLM, Efficient Transformer Decoding",
+                "category": ["mechanisms"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            },
+
+
+
+
+            {
+                "id": 27,
+                "type": "Sliding Window + RoPE (Extended Context)",
+                "description": "دمج sliding window attention مع RoPE للـpositional encoding، لدعم context طويل جدًا بكفاءة عالية.",
+                "rnnProblem": "RNN/LSTM محدود في long context memory، لأنه يعتمد على hidden state متراكم sequentially ويصعب عليه الاحتفاظ بسياق طويل جدًا.",
+                "detailedSolution": "في هذا الأسلوب، نستخدم sliding window attention (مثلاً 4096 tokens) بحيث كل token يركز فقط على tokens محلية ضمن النافذة، مع تطبيق RoPE على Q وK لتضمين positional information بشكل يمكن تعميمه على تسلسلات أطول. يمكن أيضًا إضافة global attention tokens لتغطية أهم العناصر عبر كل السياق. هذا يتيح التعامل مع contexts طويلة جدًا (100k+ tokens) بكفاءة عالية، مع الحفاظ على فهم محلي (local) وعالمي (global).",
+                "problem": "نحتاج context window طويل جدًا مع الحفاظ على الكفاءة الحسابية وفهم local وglobal patterns.",
+                "reference": "Mistral 7B (sliding window), Longformer patterns, Extended Context Transformers",
+                "category": ["mechanisms", "sparse"],
+                "classification": "mechanism",
+                "classificationType": "advanced"
+            }
+
+
+
+
+        ];
+
+        // البيانات: التحسينات التنفيذية والمعماريات (5 أنواع)
+        const attentionOptimizations = [{
+            id: 1,
+            type: "Flash Attention",
+            description: "تحسين تنفيذي لتقليل استخدام الذاكرة (IO-aware)",
+            classification: "تحسين تنفيذي",
+            function: "نحسب attention بلوكات صغيرة، الذاكرة أقل ونتيجة صحيحة (IO-aware)",
+            reference: "FlashAttention (Dao et al., 2022)",
+            category: ["optimizations"],
+            classificationType: "implementation"
+        }, {
+            id: 2,
+            type: "PyTorch Basic Attention",
+            description: "واجهة برمجة أساسية للانتباه في PyTorch",
+            classification: "تنفيذ في إطار عمل",
+            function: "يدعم batching، masking، GPU acceleration",
+            reference: "torch.nn.functional.scaled_dot_product_attention",
+            category: ["optimizations", "pytorch"],
+            classificationType: "pytorch"
+        }, {
+            id: 3,
+            type: "PyTorch Multi-Head Attention",
+            description: "واجهة برمجة للانتباه متعدد الرؤوس في PyTorch",
+            classification: "تنفيذ في إطار عمل",
+            function: "multi-head projections + concatenation؛ fully GPU optimized",
+            reference: "torch.nn.MultiheadAttention",
+            category: ["optimizations", "pytorch"],
+            classificationType: "pytorch"
+        }, {
+            id: 4,
+            type: "PyTorch Causal Attention",
+            description: "واجهة برمجة للانتباه السببي (مع قناع) في PyTorch",
+            classification: "تنفيذ في إطار عمل",
+            function: "masking يضمن causality مع parallel computation",
+            reference: "torch.nn.TransformerDecoder",
+            category: ["optimizations", "pytorch"],
+            classificationType: "pytorch"
+        }, {
+            id: 5,
+            type: "Mixture of Experts (MoE)",
+            description: "معمارية توجيه ديناميكي للخبراء",
+            classification: "معمارية حساب شرطي",
+            function: "Queries تروح للـexperts المناسبة؛ كل expert يعالج subset بس → أكثر كفاءة",
+            reference: "Switch Transformer, MoE in Large Models",
+            category: ["optimizations"],
+            classificationType: "architecture"
+        }];
+
+
+
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', function() {
+            const mechanismsBody = document.getElementById('mechanismsBody');
+            const optimizationsBody = document.getElementById('optimizationsBody');
+            const searchInput = document.getElementById('searchInput');
+            const clearSearchBtn = document.getElementById('clearSearch');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const resetSearchBtn = document.getElementById('resetSearch');
+            const noResultsDiv = document.getElementById('noResults');
+            const copyLinkBtn = document.getElementById('copyLink');
+            const copyNotification = document.getElementById('copyNotification');
+            const totalMechanismsSpan = document.getElementById('totalMechanisms');
+            const totalOptimizationsSpan = document.getElementById('totalOptimizations');
+            const totalFoundSpan = document.getElementById('totalFound');
+
+            let currentFilter = 'all';
+            let currentSearch = '';
+
+            // تحميل حالة البحث والفلتر من localStorage
+            const savedFilter = localStorage.getItem('attentionFilter') || 'all';
+            const savedSearch = localStorage.getItem('attentionSearch') || '';
+
+            // تعيين القيم المحفوظة
+            currentFilter = savedFilter;
+            currentSearch = savedSearch;
+            searchInput.value = savedSearch;
+
+            // تفعيل الزر المناسب
+            filterButtons.forEach(btn => {
+                if (btn.dataset.filter === savedFilter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // عرض/إخفاء زر مسح البحث
+            if (savedSearch.trim()) {
+                clearSearchBtn.classList.add('visible');
+            }
+
+            // تعيين الإحصائيات الأولية
+            totalMechanismsSpan.textContent = attentionMechanisms.length;
+            totalOptimizationsSpan.textContent = attentionOptimizations.length;
+            totalFoundSpan.textContent = attentionMechanisms.length + attentionOptimizations.length;
+
+            // تحديث أرقام الأزرار
+            updateFilterButtonsCount();
+
+            // عرض البيانات
+            renderTables();
+
+            // وظيفة البحث
+            searchInput.addEventListener('input', function(e) {
+                currentSearch = e.target.value.trim().toLowerCase();
+                localStorage.setItem('attentionSearch', currentSearch);
+
+                if (currentSearch) {
+                    clearSearchBtn.classList.add('visible');
+                } else {
+                    clearSearchBtn.classList.remove('visible');
+                }
+
+                renderTables();
+            });
+
+            // مسح البحث
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                currentSearch = '';
+                localStorage.setItem('attentionSearch', '');
+                clearSearchBtn.classList.remove('visible');
+                renderTables();
+                searchInput.focus();
+            });
+
+            // أزرار الفلترة
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+
+                    // تحديث الأزرار النشطة
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    currentFilter = filter;
+                    localStorage.setItem('attentionFilter', filter);
+
+                    renderTables();
+                });
+            });
+
+            // إعادة تعيين البحث
+            resetSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                currentSearch = '';
+                localStorage.setItem('attentionSearch', '');
+                clearSearchBtn.classList.remove('visible');
+
+                // إعادة تعيين الفلتر للكل
+                filterButtons.forEach(b => b.classList.remove('active'));
+                filterButtons[0].classList.add('active');
+                currentFilter = 'all';
+                localStorage.setItem('attentionFilter', 'all');
+
+                renderTables();
+            });
+
+            // نسخ الرابط مع حالة البحث
+            copyLinkBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // إنشاء رابط مع معلمات البحث
+                const url = new URL(window.location);
+                url.searchParams.set('filter', currentFilter);
+                url.searchParams.set('search', currentSearch);
+
+                // نسخ الرابط للحافظة
+                navigator.clipboard.writeText(url.toString())
+                    .then(() => {
+                        // إظهار إشعار النسخ
+                        copyNotification.classList.add('show');
+                        setTimeout(() => {
+                            copyNotification.classList.remove('show');
+                        }, 3000);
+                    })
+                    .catch(err => {
+                        console.error('فشل نسخ الرابط: ', err);
+                        alert('فشل نسخ الرابط. يرجى المحاولة مرة أخرى.');
+                    });
+            });
+
+            // تحميل معلمات URL عند فتح الصفحة
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlFilter = urlParams.get('filter');
+            const urlSearch = urlParams.get('search');
+
+            if (urlFilter) {
+                currentFilter = urlFilter;
+                localStorage.setItem('attentionFilter', urlFilter);
+
+                filterButtons.forEach(b => {
+                    b.classList.remove('active');
+                    if (b.dataset.filter === urlFilter) {
+                        b.classList.add('active');
+                    }
+                });
+            }
+
+            if (urlSearch !== null) {
+                currentSearch = urlSearch;
+                searchInput.value = urlSearch;
+                localStorage.setItem('attentionSearch', urlSearch);
+
+                if (urlSearch.trim()) {
+                    clearSearchBtn.classList.add('visible');
+                }
+            }
+
+            // وظيفة تحديث أعداد الأزرار
+            function updateFilterButtonsCount() {
+                filterButtons.forEach(btn => {
+                    const filter = btn.dataset.filter;
+                    let count = 0;
+
+                    if (filter === 'all') {
+                        count = attentionMechanisms.length + attentionOptimizations.length;
+                        btn.textContent = `الكل (${count})`;
+                    } else if (filter === 'mechanisms') {
+                        count = attentionMechanisms.length;
+                        btn.textContent = `آليات الانتباه (${count})`;
+                    } else if (filter === 'optimizations') {
+                        count = attentionOptimizations.length;
+                        btn.textContent = `تحسينات تنفيذية (${count})`;
+                    } else if (filter === 'sparse') {
+                        count = attentionMechanisms.filter(item =>
+                            item.category.includes('sparse')
+                        ).length;
+                        btn.textContent = `Sparse Attention (${count})`;
+                    } else if (filter === 'basic') {
+                        count = attentionMechanisms.filter(item =>
+                            item.category.includes('basic')
+                        ).length;
+                        btn.textContent = `أساسي (${count})`;
+                    } else if (filter === 'pytorch') {
+                        count = attentionOptimizations.filter(item =>
+                            item.category.includes('pytorch')
+                        ).length;
+                        btn.textContent = `PyTorch (${count})`;
+                    }
+                });
+            }
+
+            // وظيفة عرض الجداول
+            function renderTables() {
+                let filteredMechanisms = attentionMechanisms;
+                let filteredOptimizations = attentionOptimizations;
+
+                // تطبيق الفلتر
+                if (currentFilter !== 'all') {
+
+                    filteredMechanisms = attentionMechanisms.filter(item =>
+                        item.category.includes(currentFilter)
+                    );
+                    filteredOptimizations = attentionOptimizations.filter(item =>
+                        item.category.includes(currentFilter)
+                    );
+                }
+
+                // تطبيق البحث
+                if (currentSearch) {
+                    const searchTerm = currentSearch.toLowerCase();
+
+                    filteredMechanisms = filteredMechanisms.filter(item => {
+                        return Object.values(item).some(value => {
+                            if (typeof value === 'string') {
+                                return value.toLowerCase().includes(searchTerm);
+                            } else if (Array.isArray(value)) {
+                                return value.some(v => v.toLowerCase().includes(searchTerm));
+                            }
+                            return false;
+                        });
+                    });
+
+                    filteredOptimizations = filteredOptimizations.filter(item => {
+                        return Object.values(item).some(value => {
+                            if (typeof value === 'string') {
+                                return value.toLowerCase().includes(searchTerm);
+                            } else if (Array.isArray(value)) {
+                                return value.some(v => v.toLowerCase().includes(searchTerm));
+                            }
+                            return false;
+                        });
+                    });
+                }
+
+                // تفريغ الجداول
+                mechanismsBody.innerHTML = '';
+                optimizationsBody.innerHTML = '';
+
+                const totalVisible = filteredMechanisms.length + filteredOptimizations.length;
+
+                if (totalVisible === 0) {
+                    noResultsDiv.style.display = 'block';
+                    totalFoundSpan.textContent = '0';
+                } else {
+                    noResultsDiv.style.display = 'none';
+                    totalFoundSpan.textContent = totalVisible;
+
+                    // إضافة الصفوف لجدول الآليات
+                    filteredMechanisms.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.classList.add('fade-in');
+
+                        // تمييز الصفوف الناتجة عن البحث
+                        if (currentSearch) {
+                            row.classList.add('search-match');
+                        }
+
+                        // تحديد لون بطاقة التصنيف
+                        let classificationBadge = '';
+                        if (item.classificationType === "basic") {
+                            classificationBadge = '<span class="classification-badge classification-basic">أساسي</span>';
+                        } else if (item.classificationType === "sparse") {
+                            classificationBadge = '<span class="classification-badge classification-sparse">Sparse</span>';
+                        } else if (item.classificationType === "advanced") {
+                            classificationBadge = '<span class="classification-badge classification-architecture">متقدم</span>';
+                        }
+
+                        row.innerHTML = `
+        <td class="text-center"><span class="row-number">${item.id}</span></td>
+        <td class="text-center"><span class="type-badge">${highlightText(item.type)}</span>${classificationBadge}</td>
+        <td>${highlightText(item.description)}</td>
+        <td class="rnn-problem-cell">${highlightText(item.rnnProblem)}</td>
+        <td class="solution-cell">${highlightText(item.detailedSolution)}</td>
+        <td>${highlightText(item.problem)}</td>
+        <td><span class="category-label">${highlightText(item.reference)}</span></td>
+    `;
+
+                        mechanismsBody.appendChild(row);
+                    });
+                    // إضافة الصفوف لجدول التحسينات
+                    filteredOptimizations.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.classList.add('fade-in');
+
+                        // تمييز الصفوف الناتجة عن البحث
+                        if (currentSearch) {
+                            row.classList.add('search-match');
+                        }
+
+                        // تحديد لون بطاقة التصنيف
+                        let classificationBadge = '';
+                        if (item.classificationType === "implementation") {
+                            classificationBadge = '<span class="classification-badge classification-implementation">تنفيذ</span>';
+                        } else if (item.classificationType === "pytorch") {
+                            classificationBadge = '<span class="classification-badge classification-pytorch">PyTorch</span>';
+                        } else if (item.classificationType === "architecture") {
+                            classificationBadge = '<span class="classification-badge classification-architecture">معمارية</span>';
+                        }
+
+                        row.innerHTML = `
+                            <td class="text-center"><span class="row-number">${((attentionMechanisms.length-1) + item.id)}</span></td>
+                            <td class="text-center"><span class="type-badge">${highlightText(item.type)}</span>${classificationBadge}</td>
+                            <td><span class="category-label">${highlightText(item.classification)}</span></td>
+                            <td>${highlightText(item.function)}</td>
+                            <td><span class="category-label">${highlightText(item.reference)}</span></td>
+                        `;
+
+                        optimizationsBody.appendChild(row);
+                    });
+                }
+            }
+
+            // وظيفة تمييز نص البحث
+            function highlightText(text) {
+                if (!currentSearch || typeof text !== 'string') {
+                    return text;
+                }
+
+                const searchRegex = new RegExp(`(${currentSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                return text.replace(searchRegex, '<span class="search-highlight">$1</span>');
+            }
+
+            // إضافة تأثير التمرير السلس لأزرار الفلترة
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const firstTableTop = document.querySelector('#mechanismsTable').offsetTop;
+                    window.scrollTo({
+                        top: firstTableTop - 100,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            const popup = document.getElementById('popup');
+            const iframe = document.getElementById('popupFrame');
+            const openPopupLink = document.getElementById('openPopup');
+            const closePopupBtn = document.getElementById('closePopup');
+
+            openPopupLink.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Add class to body when popup is open
+                document.body.classList.add('popup-open');
+
+                // Show popup
+                popup.style.display = 'flex';
+
+
+                iframe.src = '/IBM_GPT_Explainer.html'; // Good demo of attention
+            });
+
+            closePopupBtn.addEventListener('click', function() {
+                // Hide popup
+                popup.style.display = 'none';
+
+                // Remove class from body
+                document.body.classList.remove('popup-open');
+
+                // Clear iframe source to stop loading
+                iframe.src = '';
+            });
+
+            // Close popup when clicking outside the container
+            popup.addEventListener('click', function(e) {
+                if (e.target === popup) {
+                    popup.style.display = 'none';
+                    document.body.classList.remove('popup-open');
+                    iframe.src = '';
+                }
+            });
+
+            // Close popup with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && popup.style.display === 'flex') {
+                    popup.style.display = 'none';
+                    document.body.classList.remove('popup-open');
+                    iframe.src = '';
+                }
+            });
+
+            // Handle iframe loading state
+            iframe.addEventListener('load', function() {
+                console.log('Iframe loaded successfully');
+            });
+
+            iframe.addEventListener('error', function() {
+                console.error('Failed to load iframe content');
+                // You could show an error message here if needed
+            });
+
+        });
+    </script>
+</body>
+
+</html>
