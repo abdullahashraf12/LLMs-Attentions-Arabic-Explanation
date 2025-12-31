@@ -919,6 +919,7 @@
             const iframe = document.getElementById('popupFrame');
             const openPopupLink = document.getElementById('openPopup');
             const closePopupBtn = document.getElementById('closePopup');
+            iframe.sandbox = "allow-scripts allow-same-origin";
 
             openPopupLink.addEventListener('click', function(e) {
                 e.preventDefault();
