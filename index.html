@@ -256,17 +256,6 @@
                 "category": ["mechanisms", "sparse"],
                 "classification": "mechanism",
                 "classificationType": "sparse"
-            }, {
-                "id": 8,
-                "type": "Global Attention",
-                "description": "توكنات محددة (special tokens) قادرة على رؤية كل التسلسل بأكمله، والعكس صحيح، بينما باقي التوكنات تعمل Local Attention.",
-                "rnnProblem": "RNN/LSTM مفيهوش فكرة global tokens، كل المعلومات لازم تمر عبر الـhidden state المضغوط، وده ممكن يضعف أو ينسى المعلومات الطويلة.",
-                "detailedSolution": "في Global Attention، نحدد بعض الـtokens (مثل [CLS] أو أول token في كل paragraph) بحيث تعمل full attention لكل التسلسل، والعكس صحيح: أي كلمة في التسلسل يمكنها التواصل مع هذه الـglobal tokens. ده يجعلها بمثابة global memory متاحة من أي مكان في التسلسل، بينما باقي التوكنات تتعامل ضمن local context فقط، مما يقلل التعقيد الحسابي مقارنة بالـfull attention لكل التوكنات، ويحافظ على القدرة على الوصول إلى معلومات مهمة عبر التسلسل.",
-                "problem": "نحتاج أن بعض الـtokens المهمة ترى كل الكلمات في التسلسل والعكس، مثل حالات الـclassification أو summarization.",
-                "reference": "Longformer (2020), BigBird (2020), أي نموذج sparse attention يستخدم global tokens.",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
             }
 
 
