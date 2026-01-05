@@ -157,367 +157,805 @@
     </div>
 
     <script>
+
+
+
         const attentionMechanisms = [{
-                "id": 1,
-                "type": "Basic Attention",
-                "description": "الانتباه الأساسي - طريقة تحسين على RNN/LSTM التقليدي لربط كل كلمة بكل الكلمات الأخرى في التسلسل.",
-                "rnnProblem": "RNN/LSTM بتعالج الكلمات واحدة واحدة، فلما يوصل لآخر الجملة بينسى أول الجملة بسبب مشكلة vanishing gradient، وما بيقدرش يربط كلمات بعيدة بسهولة.",
-                "detailedSolution": "Basic Attention بيضيف آلية تخلي كل خطوة في الـdecoder تقدر 'تشوف' كل hidden states للـencoder، بدل ما تعتمد بس على آخر hidden state. العملية تعتمد على ثلاث مكونات رئيسية: Q (Query) من الـdecoder، K (Key) وV (Value) من الـencoder. بيتم حساب تشابه كل Q مع كل K للحصول على weights، والـweights دي بتتطبق على الـV لتكوين context vector لكل خطوة. ده بيخلي النموذج يربط كلمات بعيدة بسهولة ويقلل مشكلة نسيان المعلومات القديمة. ⚠️ ملحوظة: التعقيد عادة O(n*m) حيث n طول الـdecoder و m طول الـencoder، مش كما في self-attention داخل نفس التسلسل.",
-                "problem": "محتاجين ربط كلمات بعيدة عن بعض في التسلسل، خصوصًا في الترجمة أو ملء النصوص الطويلة.",
-                "reference": "التطبيقات الأساسية للانتباه: machine translation, seq2seq tasks, speech recognition.",
-                "category": ["mechanisms", "basic"],
-                "classification": "mechanism",
-                "classificationType": "basic"
-            }, {
-                "id": 2,
-                "type": "Self-Attention",
-                "description": "Q, K, V مأخوذة من نفس التسلسل (نفس المصدر)، تتيح لكل كلمة أن ترى كل الكلمات الأخرى داخل نفس التسلسل في نفس الوقت.",
-                "rnnProblem": "RNN/LSTM بتعالج الكلمات sequential، فبتاخد وقت طويل ومش بتقدر تعمل parallel processing، وكمان صعب عليها تتعامل مع تسلسلات طويلة بسبب vanishing/exploding gradient.",
-                "detailedSolution": "Self-Attention بتحسب علاقة كل كلمة مع كل الكلمات الأخرى في نفس التسلسل باستخدام Q, K, V من نفس المصدر. العملية الأساسية تُعرف بـScaled Dot-Product Attention: <span style='color:green; display: block; direction: ltr; text-align: left;'>Attention(Q,K,V) = softmax(QK<sup>T</sup>/√d<sub>k</sub>)V</span>. هنا <span style='color:green; display: inline-block; direction: ltr;'>√d<sub>k</sub></span> بيستخدم لتقليل احتمال gradient explosion. الميزة الرئيسية: كل الكلمات بتُعالَج **متوازيًا (parallel)**، وبتكون النماذج قادرة على الربط بين أي كلمات مهما كانت المسافة بينهم داخل التسلسل. التعقيد: O(n²) بالنسبة لطول التسلسل n.",
-                "problem": "محتاجين نفهم علاقات كل الكلمات جوه نفس الجملة أو التسلسل في نفس الوقت، وكمان نقدر نعمل parallel processing لتسلسلات طويلة.",
-                "reference": "BERT, GPT, Transformer Encoder, Transformer Decoder",
-                "category": ["mechanisms", "basic"],
-                "classification": "mechanism",
-                "classificationType": "basic"
-            }, {
-                "id": 3,
-                "type": "Multi-Head Attention",
-                "description": "عدة نسخ متوازية من Self-Attention تُسقط على أبعاد مختلفة ثم يتم دمجها، بحيث كل رأس (head) يتعلم نوع مختلف من العلاقات بين الكلمات.",
-                "rnnProblem": "RNN/LSTM بيتعلم نوع واحد من العلاقات فقط بين الكلمات، ومش بيقدر يركز على أكتر من pattern في نفس الوقت، وده بيحد من القدرة على فهم العلاقات المتعددة (syntax, semantics, position).",
-                "detailedSolution": "Multi-Head Attention بيعمل عدة نسخ من Attention (heads) بشكل متوازي، كل واحد بيتعلم نوع مختلف من العلاقات. بعد كده، النواتج بتتجمع عن طريق concat وضربها في مصفوفة وزن W<sup>O</sup>: <span style='color:green; display: block; direction: ltr; text-align: left;'>MultiHead(Q,K,V) = Concat(head₁,...,head<sub>h</sub>)W<sup>O</sup></span> حيث <span style='color:green; display: block; direction: ltr; text-align: left;'>head<sub>i</sub> = Attention(QW<sup>Q</sup><sub>i</sub>, KW<sup>K</sup><sub>i</sub>, VW<sup>V</sup><sub>i</sub>)</span>. كل رأس يلتقط أنماط مختلفة في البيانات (مثلاً التراكيب النحوية، المعاني، الموقع)، مما يزيد من قدرة النموذج على تمثيل العلاقات المعقدة بين الكلمات.",
-                "problem": "محتاجين نفهم أكتر من نوع علاقة بين الكلمات في نفس الوقت، سواء معناها أو موقعها أو العلاقة التركيبية.",
-                "reference": "Transformer (معيار صناعي)، GPT, BERT",
-                "category": ["mechanisms", "basic"],
-                "classification": "mechanism",
-                "classificationType": "basic"
-            }, {
-                "id": 4,
-                "type": "Cross-Attention",
-                "description": "Q مأخوذة من تسلسل (عادة Decoder) وK/V مأخوذة من تسلسل آخر مختلف (عادة Encoder)، لتسمح لكل عنصر في الـDecoder بالنظر لكل عناصر الـEncoder.",
-                "rnnProblem": "في Encoder-Decoder RNN/LSTM التقليدي، الـDecoder غالبًا بيعتمد على آخر hidden state فقط من الـEncoder، وبالتالي بينسى معلومات كثيرة من الـinput الأصلي، خصوصًا للجمل الطويلة.",
-                "detailedSolution": "Cross-Attention بيحل المشكلة دي عن طريق السماح لكل كلمة في الـDecoder بأنها تاخد Q من hidden state الحالي للـDecoder، وK/V من كل hidden states للـEncoder. العملية: كل كلمة في الـDecoder بتحسب العلاقة مع كل الكلمات في الـEncoder وتختار المعلومات الأكثر أهمية. الصيغة الأساسية: <span style='color:green; display: block; direction: ltr; text-align: left;'>CrossAttn(Q<sub>dec</sub>, K<sub>enc</sub>, V<sub>enc</sub>) = softmax(Q<sub>dec</sub>K<sub>enc</sub><sup>T</sup>/√d<sub>k</sub>) V<sub>enc</sub></span>. ده بيسمح للـDecoder بالوصول لكل المعلومات المهمة من الـEncoder مباشرة.",
-                "problem": "نحتاج نربط جملة أو تسلسل بـتسلسل آخر مختلف (مثل الـEncoder-Decoder في الترجمة الآلية أو الـseq2seq tasks).",
-                "reference": "Transformer Decoder, T5, BART، الترجمة الآلية، أي نموذج Encoder-Decoder يعتمد على Attention.",
-                "category": ["mechanisms", "basic"],
-                "classification": "mechanism",
-                "classificationType": "basic"
-            }
+    "id": 1,
+    "type": "Basic Attention",
+    "description": "الانتباه الأساسي - طريقة تحسين على RNN/LSTM التقليدي لربط كل كلمة بكل الكلمات الأخرى في التسلسل.",
+    "rnnProblem": "RNN/LSTM بتعالج الكلمات واحدة واحدة، فلما يوصل لآخر الجملة بينسى أول الجملة بسبب مشكلة vanishing gradient، وما بيقدرش يربط كلمات بعيدة بسهولة.",
+    "detailedSolution": "Basic Attention بيضيف آلية تخلي كل خطوة في الـdecoder تقدر 'تشوف' كل hidden states للـencoder، بدل ما تعتمد بس على آخر hidden state. العملية تعتمد على ثلاث مكونات رئيسية: Q (Query) من الـdecoder، K (Key) وV (Value) من الـencoder. بيتم حساب تشابه كل Q مع كل K للحصول على weights، والـweights دي بتتطبق على الـV لتكوين context vector لكل خطوة. ده بيخلي النموذج يربط كلمات بعيدة بسهولة ويقلل مشكلة نسيان المعلومات القديمة. ⚠️ ملحوظة: التعقيد عادة O(n*m) حيث n طول الـdecoder و m طول الـencoder، مش كما في self-attention داخل نفس التسلسل.",
+    "problem": "محتاجين ربط كلمات بعيدة عن بعض في التسلسل، خصوصًا في الترجمة أو ملء النصوص الطويلة.",
+    "reference": "التطبيقات الأساسية للانتباه: machine translation, seq2seq tasks, speech recognition.",
+    "category": ["mechanisms", "basic"],
+    "classification": "mechanism",
+    "classificationType": "basic"
+}, {
+    "id": 2,
+    "type": "Self-Attention",
+    "description": "Q, K, V مأخوذة من نفس التسلسل (نفس المصدر)، تتيح لكل كلمة أن ترى كل الكلمات الأخرى داخل نفس التسلسل في نفس الوقت.",
+    "rnnProblem": "RNN/LSTM بتعالج الكلمات sequential، فبتاخد وقت طويل ومش بتقدر تعمل parallel processing، وكمان صعب عليها تتعامل مع تسلسلات طويلة بسبب vanishing/exploding gradient.",
+    "detailedSolution": "Self-Attention بتحسب علاقة كل كلمة مع كل الكلمات الأخرى في نفس التسلسل باستخدام Q, K, V من نفس المصدر. العملية الأساسية تُعرف بـScaled Dot-Product Attention: <span style='color:green; display: block; direction: ltr; text-align: left;'>Attention(Q,K,V) = softmax(QK<sup>T</sup>/√d<sub>k</sub>)V</span>. هنا <span style='color:green; display: inline-block; direction: ltr;'>√d<sub>k</sub></span> بيستخدم لتقليل احتمال gradient explosion. الميزة الرئيسية: كل الكلمات بتُعالَج **متوازيًا (parallel)**، وبتكون النماذج قادرة على الربط بين أي كلمات مهما كانت المسافة بينهم داخل التسلسل. التعقيد: O(n²) بالنسبة لطول التسلسل n.",
+    "problem": "محتاجين نفهم علاقات كل الكلمات جوه نفس الجملة أو التسلسل في نفس الوقت، وكمان نقدر نعمل parallel processing لتسلسلات طويلة.",
+    "reference": "BERT, GPT, Transformer Encoder, Transformer Decoder",
+    "category": ["mechanisms", "basic"],
+    "classification": "mechanism",
+    "classificationType": "basic"
+}, {
+    "id": 3,
+    "type": "Multi-Head Attention",
+    "description": "عدة نسخ متوازية من Self-Attention تُسقط على أبعاد مختلفة ثم يتم دمجها، بحيث كل رأس (head) يتعلم نوع مختلف من العلاقات بين الكلمات.",
+    "rnnProblem": "RNN/LSTM بيتعلم نوع واحد من العلاقات فقط بين الكلمات، ومش بيقدر يركز على أكتر من pattern في نفس الوقت، وده بيحد من القدرة على فهم العلاقات المتعددة (syntax, semantics, position).",
+    "detailedSolution": "Multi-Head Attention بيعمل عدة نسخ من Attention (heads) بشكل متوازي، كل واحد بيتعلم نوع مختلف من العلاقات. بعد كده، النواتج بتتجمع عن طريق concat وضربها في مصفوفة وزن W<sup>O</sup>: <span style='color:green; display: block; direction: ltr; text-align: left;'>MultiHead(Q,K,V) = Concat(head₁,...,head<sub>h</sub>)W<sup>O</sup></span> حيث <span style='color:green; display: block; direction: ltr; text-align: left;'>head<sub>i</sub> = Attention(QW<sup>Q</sup><sub>i</sub>, KW<sup>K</sup><sub>i</sub>, VW<sup>V</sup><sub>i</sub>)</span>. كل رأس يلتقط أنماط مختلفة في البيانات (مثلاً التراكيب النحوية، المعاني، الموقع)، مما يزيد من قدرة النموذج على تمثيل العلاقات المعقدة بين الكلمات.",
+    "problem": "محتاجين نفهم أكتر من نوع علاقة بين الكلمات في نفس الوقت، سواء معناها أو موقعها أو العلاقة التركيبية.",
+    "reference": "Transformer (معيار صناعي)، GPT, BERT",
+    "category": ["mechanisms", "basic"],
+    "classification": "mechanism",
+    "classificationType": "basic"
+}, {
+    "id": 4,
+    "type": "Cross-Attention",
+    "description": "Q مأخوذة من تسلسل (عادة Decoder) وK/V مأخوذة من تسلسل آخر مختلف (عادة Encoder)، لتسمح لكل عنصر في الـDecoder بالنظر لكل عناصر الـEncoder.",
+    "rnnProblem": "في Encoder-Decoder RNN/LSTM التقليدي، الـDecoder غالبًا بيعتمد على آخر hidden state فقط من الـEncoder، وبالتالي بينسى معلومات كثيرة من الـinput الأصلي، خصوصًا للجمل الطويلة.",
+    "detailedSolution": "Cross-Attention بيحل المشكلة دي عن طريق السماح لكل كلمة في الـDecoder بأنها تاخد Q من hidden state الحالي للـDecoder، وK/V من كل hidden states للـEncoder. العملية: كل كلمة في الـDecoder بتحسب العلاقة مع كل الكلمات في الـEncoder وتختار المعلومات الأكثر أهمية. الصيغة الأساسية: <span style='color:green; display: block; direction: ltr; text-align: left;'>CrossAttn(Q<sub>dec</sub>, K<sub>enc</sub>, V<sub>enc</sub>) = softmax(Q<sub>dec</sub>K<sub>enc</sub><sup>T</sup>/√d<sub>k</sub>) V<sub>enc</sub></span>. ده بيسمح للـDecoder بالوصول لكل المعلومات المهمة من الـEncoder مباشرة.",
+    "problem": "نحتاج نربط جملة أو تسلسل بـتسلسل آخر مختلف (مثل الـEncoder-Decoder في الترجمة الآلية أو الـseq2seq tasks).",
+    "reference": "Transformer Decoder, T5, BART، الترجمة الآلية، أي نموذج Encoder-Decoder يعتمد على Attention.",
+    "category": ["mechanisms", "basic"],
+    "classification": "mechanism",
+    "classificationType": "basic"
+}, {
+    "id": 5,
+    "type": "Causal (Masked) Attention",
+    "description": "قناع ثلاثي سفلي (lower triangular mask) يمنع كل كلمة من رؤية الكلمات المستقبلية في نفس التسلسل، مما يضمن توليد نص خطوة خطوة.",
+    "rnnProblem": "RNN/LSTM بطبيعته causal، أي كل خطوة تعتمد على السابقة فقط، لكنه بطيء جدًا لأنه بيعالج الكلمات sequential وما بيدعم parallel processing.",
+    "detailedSolution": "Causal Attention بيطبق mask مثلثي على الـattention scores قبل الـsoftmax بحيث أي كلمة في position i تشوف فقط positions ≤ i: <span style='color:green; display: block; direction: ltr; text-align: left;'>mask[i,j] = -∞ if j > i</span>. ده يسمح للنموذج بعدم الاطلاع على المستقبل أثناء التدريب أو التوليد، وفي نفس الوقت **يسمح بالـparallel training** على كامل التسلسل بفضل آلية الـSelf-Attention masked.",
+    "problem": "محتاجين توليد نص خطوة خطوة (auto-regressive) من غير ما الكلمة الحالية تبص على الكلمات المستقبلية.",
+    "reference": "GPT series, LLaMA, Transformer Decoder للنمذجة التوليدية، أي نموذج autoregressive.",
+    "category": ["mechanisms", "basic"],
+    "classification": "mechanism",
+    "classificationType": "basic"
+}, {
+    "id": 6,
+    "type": "Local / Sliding Window Attention",
+    "description": "الانتباه يكون ضمن نافذة محدودة حول كل توكن، بحيث كل كلمة ترى فقط مجموعة محددة من الكلمات القريبة بدل كل التسلسل.",
+    "rnnProblem": "RNN/LSTM بيعالج كل التسلسل بالكامل حتى لو المعلومات المهمة قريبة، وده غير فعال خصوصًا للتسلسلات الطويلة (inefficient).",
+    "detailedSolution": "في Local / Sliding Window Attention، كل token بيشوف فقط نافذة محددة حوله (مثلاً ±256 tokens). ده يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n×w)</span> حيث w حجم النافذة الثابت، مع الحفاظ على السياق المحلي. يمكن دمجه مع global attention لتغطية الـlong-range dependencies إذا احتجنا، مما يعطي توازن بين الكفاءة والقدرة على التعامل مع التسلسلات الطويلة.",
+    "problem": "نحتاج نركز على السياق المحلي بكفاءة عالية، مع تقليل التعقيد الحسابي بالنسبة للتسلسلات الطويلة.",
+    "reference": "Longformer (2020), Sparse Transformer, BigBird",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 7,
+    "type": "Strided / Dilated Attention",
+    "description": "الانتباه يتم عبر خطوات متباعدة (كل k توكن)، بحيث كل كلمة ترى كلمات متباعدة بدلاً من كل التسلسل.",
+    "rnnProblem": "RNN/LSTM لازم يمر على كل الـsteps عشان يوصل لمعلومة بعيدة، وده بيضعف gradient ويبطئ التعلم، خصوصًا مع التسلسلات الطويلة.",
+    "detailedSolution": "في Strided / Dilated Attention، كل token يشوف فقط كل k tokens (stride = k) بدلاً من كل الكلمات. ده يسمح للنموذج بالوصول للمسافات البعيدة بتكلفة أقل: <span style='color:green; display: inline-block; direction: ltr;'>O(n²/k)</span>. يمكن استخدام عدة strides مختلفة عبر layers متعددة لتعلم multi-scale patterns، بحيث النموذج يلتقط العلاقات القصيرة والطويلة بكفاءة عالية.",
+    "problem": "نحتاج الوصول إلى كلمات بعيدة في التسلسل بتكلفة أقل من O(n²)، مع الحفاظ على capture للـlong-range dependencies.",
+    "reference": "Sparse Transformer (OpenAI, 2019), Long-Range Transformer",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 8,
+    "type": "Global Attention",
+    "description": "توكنات محددة (special tokens) قادرة على رؤية كل التسلسل بأكمله، والعكس صحيح، بينما باقي التوكنات تعمل Local Attention.",
+    "rnnProblem": "RNN/LSTM مفيهوش فكرة global tokens، كل المعلومات لازم تمر عبر الـhidden state المضغوط، وده ممكن يضعف أو ينسى المعلومات الطويلة.",
+    "detailedSolution": "في Global Attention، نحدد بعض الـtokens (مثل [CLS] أو أول token في كل paragraph) بحيث تعمل full attention لكل التسلسل، والعكس صحيح: أي كلمة في التسلسل يمكنها التواصل مع هذه الـglobal tokens. ده يجعلها بمثابة global memory متاحة من أي مكان في التسلسل، بينما باقي التوكنات تتعامل ضمن local context فقط، مما يقلل التعقيد الحسابي مقارنة بالـfull attention لكل التوكنات، ويحافظ على القدرة على الوصول إلى معلومات مهمة عبر التسلسل.",
+    "problem": "نحتاج أن بعض الـtokens المهمة ترى كل الكلمات في التسلسل والعكس، مثل حالات الـclassification أو summarization.",
+    "reference": "Longformer (2020), BigBird (2020), أي نموذج sparse attention يستخدم global tokens.",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 9,
+    "type": "Random Attention",
+    "description": "كل توكن يختار عدد ثابت من التوكنات الأخرى بشكل عشوائي للانتباه إليها، لتوفير تنوع وتغطية إضافية في المعلومات.",
+    "rnnProblem": "RNN/LSTM بيتبع نفس المسار دائمًا أثناء معالجة التسلسل، وما بيحتويش على randomness طبيعي، وده ممكن يقلل التعميم ويزيد overfitting للـpatterns المحددة.",
+    "detailedSolution": "في Random Attention، كل token يختار r tokens عشوائية للانتباه إليها باستخدام random sampling مع fixed seed لضمان reproducibility. ده بيكسر التماثل بين المسارات المختلفة، يمنع overfitting، ويسمح للمعلومات بالانتشار عبر network عبر مسارات متنوعة. يمكن دمجه مع Local أو Global Attention لتغطية كل التسلسل بكفاءة مع إضافة diversity.",
+    "problem": "نحتاج إضافة diversity للانتباه ومنع overfitting للـpatterns المحددة، مع تحسين انتشار المعلومات عبر الشبكة.",
+    "reference": "BigBird (2020), Sparse Transformer, أي نموذج Sparse Attention يستخدم random connections.",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 10,
+    "type": "Block / Chunked Attention",
+    "description": "تقسيم التسلسل إلى كتل (blocks) والانتباه داخل كل block وبين الكتل المجاورة، لتقليل التعقيد مع الحفاظ على السياق المحلي والمتجاور.",
+    "rnnProblem": "RNN/LSTM بيعالج التسلسل كله خطوة خطوة، وده بيصعب التعامل مع sequences طويلة جدًا ويزيد الوقت اللازم للحساب.",
+    "detailedSolution": "في Block / Chunked Attention، نقسم الـsequence إلى blocks (مثلاً كل block = 64 tokens). نقوم بعمل attention داخل كل block بالإضافة إلى attention بين blocks المجاورة لضمان continuity. هذا يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n²/b)</span> حيث b حجم block. يمكن استخدام blocks متداخلة (overlapping) لضمان عدم فقدان السياق عند الحدود بين blocks.",
+    "problem": "نحتاج معالجة sequences طويلة بكفاءة عن طريق تقسيمها إلى كتل مع الحفاظ على الربط بين الكلمات المتجاورة.",
+    "reference": "BigBird (2020), Block-Sparse Attention, Long-Range Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 11,
+    "type": "Fixed Patterns Attention",
+    "description": "استخدام أنماط انتباه ثابتة محددة مسبقًا (مثل الصفوف، الأعمدة، أو الأقطار) لاستغلال البنية الطبيعية للبيانات المنظمة هندسياً.",
+    "rnnProblem": "RNN/LSTM مش قادر يستفيد من البنية الهندسية للبيانات (مثل الصور 2D أو الجداول)، لأنه يعالج التسلسل بشكل linear فقط ويضيع المعلومات الهيكلية.",
+    "detailedSolution": "في Fixed Patterns Attention، نحدد patterns محددة مسبقًا مثل: \n- row attention: كل عنصر يشوف العناصر في نفس الصف\n- column attention: كل عنصر يشوف العناصر في نفس العمود\n- diagonal attention: كل عنصر يشوف العناصر على القطر\nهذه الأنماط تستغل البنية الطبيعية للبيانات المنظمة، وتقلل التعقيد الحسابي بشكل كبير مقارنة بالـfull attention لجميع العناصر، مع الحفاظ على المعلومات الهيكلية المهمة.",
+    "problem": "نحتاج استخدام patterns ثابتة محددة مسبقًا لتقليل التعقيد الحسابي (sparsity) والاستفادة من البنية الهندسية للبيانات.",
+    "reference": "Sparse Transformer (OpenAI, 2019), Long-Range Sparse Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 12,
+    "type": "Sparse Top-K Attention",
+    "description": "كل token يركز على أعلى K قيم من attention scores فقط بشكل ديناميكي، مما يقلل الحسابات ويركز على العناصر الأهم.",
+    "rnnProblem": "RNN/LSTM بيدي نفس الاهتمام لكل الـsteps، ومش بيركز على أهم العناصر في التسلسل، مما يقلل الكفاءة خصوصًا للتسلسلات الطويلة.",
+    "detailedSolution": "في Sparse Top-K Attention، نحسب كل attention scores أولاً، ثم نأخذ فقط أعلى K قيم ونضع باقي القيم = 0 قبل تطبيق softmax. هذا يسمح للنموذج بالتركيز على أهم K tokens بشكل adaptive حسب محتوى التسلسل. ⚠️ للـbackward pass، يمكن استخدام straight-through estimator أو softmax مع temperature للحفاظ على differentiability أثناء التدريب.",
+    "problem": "نحتاج تقليل الحسابات على التسلسل الطويل والتركيز فقط على أهم الكلمات أو العناصر في الـsequence.",
+    "reference": "Top-K Sparse Attention (Adaptive Sparsity), Long-Range Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 13,
+    "type": "LSH (Locality Sensitive Hashing) Attention",
+    "description": "تقريب التشابه بين التوكنات عبر hashing لتجميع التوكنات المتشابهة معًا، بحيث يتم عمل attention فقط ضمن التوكنات المتشابهة.",
+    "rnnProblem": "RNN/LSTM لازم يعالج كل التسلسل خطوة خطوة، حتى لو فيه tokens متشابهة يمكن تجميعهم، مما يزيد الوقت والتعقيد الحسابي مع التسلسلات الطويلة.",
+    "detailedSolution": "في LSH Attention، نستخدم Locality Sensitive Hashing لتحويل الـqueries والـkeys إلى hash buckets. التوكنات التي تقع في نفس الـbucket أو في buckets مجاورة تقوم بعمل attention مع بعضها فقط. هذا يقلل التعقيد الحسابي من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n log n)</span> في المتوسط، مع الحفاظ على قدرة النموذج على التركيز على التوكنات المتشابهة بشكل فعال.",
+    "problem": "نحتاج العثور على التوكنات المتشابهة بسرعة والعمل عليها فقط، لتسريع الانتباه في التسلسلات الطويلة.",
+    "reference": "Reformer (Kitaev et al., 2020), Long-Range Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 14,
+    "type": "Clustering-Based Attention",
+    "description": "تجميع التوكنات المتشابهة معًا (semantically) والانتباه داخل كل مجموعة (cluster) لتقليل الحسابات مع الحفاظ على تمثيل العلاقات المهمة.",
+    "rnnProblem": "RNN/LSTM مش قادر يجمع tokens متشابهة semantically، لأنه يعالج التسلسل خطوة خطوة وما بيستفيد من البنية الدلالية بين الكلمات.",
+    "detailedSolution": "في Clustering-Based Attention، نستخدم soft clustering على keys/queries باستخدام learnable cluster centers. كل cluster يعمل attention داخليًا (internal attention)، ويمكن إضافة cross-cluster attention محدود إذا احتجنا لربط المعلومات بين المجموعات. soft assignment يُنفذ عادةً باستخدام Gumbel-Softmax أو تقنيات مشابهة لضمان differentiability أثناء التدريب، بدل hard K-means assignment. هذا يقلل التعقيد الحسابي ويعطي قدرة النموذج على التركيز على التوكنات المتشابهة semantically.",
+    "problem": "نحتاج تجميع tokens متشابهة semantically والانتباه داخل كل مجموعة لتقليل الحسابات وتحسين التعلم.",
+    "reference": "Clustered Attention, Routing Transformers (2020), Long-Range Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 15,
+    "type": "Learnable Sparse Patterns",
+    "description": "تعلم أنماط التناثر (sparsity) أثناء التدريب بطريقة قابلة للاشتقاق، بحيث يقرر النموذج بنفسه أي الـconnections يجب أن تكون فعالة وأيها تُعطَّل.",
+    "rnnProblem": "RNN/LSTM مش sparse بطبيعته، بيعالج كل العناصر في التسلسل بنفس الطريقة ولا يميز بين المهم وغير المهم، مما يزيد التعقيد الحسابي ويحد من الكفاءة.",
+    "detailedSolution": "في Learnable Sparse Patterns، نضيف learnable mask parameters على مصفوفة الـattention. خلال التدريب، الـmask يتعلم أن يجعل بعض الـconnections = 0 لتقليل التعقيد والتركيز على العلاقات المهمة. يتم استخدام Gumbel-Softmax أو Concrete distribution لضمان differentiability، ويمكن إضافة L0 regularization لتشجيع sparsity. بهذه الطريقة، الـsparsity pattern نفسه يتعلم من البيانات بطريقة adaptive وفعالة.",
+    "problem": "نحتاج أن يتعلم النموذج نفسه أنماط sparsity المناسبة من البيانات، بدل تحديدها يدوياً.",
+    "reference": "Dynamic Sparse Attention, Differentiable Masking, Learnable Sparse Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 16,
+    "type": "Linear Attention",
+    "description": "استخدام Kernel Trick لتحويل التعقيد الحسابي من O(n²) إلى خطي O(n)، مع الحفاظ على القدرة على parallel processing.",
+    "rnnProblem": "RNN/LSTM خطي O(n) لكن sequential، بينما Self-Attention التقليدي O(n²) لكنه parallelizable، لذلك نحتاج مزيج من كفاءة الـRNN وخواص الـAttention.",
+    "detailedSolution": "في Linear Attention، نستخدم kernel trick: <span style='color:green; display: block; direction: ltr; text-align: left;'>φ(Q)(φ(K)<sup>T</sup>V)</span> بدل <span style='color:green; display: block; direction: ltr; text-align: left;'>(QK<sup>T</sup>)V</span>. أولاً نحسب (φ(K)<sup>T</sup>V) بتعقيد O(nd²)، ثم نضرب φ(Q) في النتيجة O(nd²). بالتالي يصبح التعقيد الكلي <span style='color:green; display: inline-block; direction: ltr;'>O(nd²) ≈ O(n)</span> للـd ثابت، مع إمكانية parallel processing على كامل التسلسل، مما يجمع بين السرعة والكفاءة الحسابية.",
+    "problem": "نحتاج تقليل التعقيد من O(n²) إلى O(n) مع الاحتفاظ بالقدرة على parallel processing في تسلسلات طويلة.",
+    "reference": "Linear Transformer (Katharopoulos et al., 2020), Kernel-based Attention, Efficient Transformers",
+    "category": ["mechanisms"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 17,
+    "type": "Performer Attention",
+    "description": "تقريب Self-Attention باستخدام Random Feature Mapping (FAVOR+) لتقليل التعقيد الحسابي مع الحفاظ على دقة عالية.",
+    "rnnProblem": "RNN/LSTM تواجه نفس المشكلة: sequential processing أو Self-Attention التقليدي O(n²)، مما يصعب التعامل مع sequences طويلة جدًا.",
+    "detailedSolution": "في Performer Attention، نستخدم random Fourier features عبر FAVOR+ algorithm لتقريب softmax kernel: <span style='color:green; display: block; direction: ltr; text-align: left;'>softmax(QK<sup>T</sup>/√d) ≈ φ(Q)φ(K)<sup>T</sup></span> حيث φ هي positive random features. هذا يسمح بحساب attention بتعقيد O(n) بدل O(n²)، مع الحفاظ على unbiased approximation للـsoftmax attention، وبالتالي يمكن التعامل مع sequences طويلة جدًا بكفاءة عالية.",
+    "problem": "نحتاج scalable Self-Attention لتسلسلات طويلة جدًا مع الحفاظ على دقة الـsoftmax التقليدية.",
+    "reference": "Performer (Choromanski et al., 2021), FAVOR+ algorithm, Efficient Transformers",
+    "category": ["mechanisms"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 18,
+    "type": "Relative Positional Attention",
+    "description": "إضافة تحيز يعتمد على المسافة النسبية بين التوكنات، بحيث يتمكن النموذج من التعلم بناءً على المسافة بين الكلمات بدل الـabsolute positions فقط.",
+    "rnnProblem": "RNN/LSTM عنده معلومات positional ضمنية لأنه sequential، لكن مع مرور الوقت (long sequences) هذه المعلومات بتضعف أو تُنسى، خصوصًا للسياق الطويل.",
+    "detailedSolution": "في Relative Positional Attention، بدل استخدام absolute position embeddings، نضيف bias على attention scores حسب المسافة النسبية بين التوكنات (i-j): <span style='color:green; display: block; direction: ltr; text-align: left;'>score<sub>ij</sub> = q<sub>i</sub>·k<sub>j</sub> + q<sub>i</sub>·r<sub>(i-j)</sub></span> حيث r هو تمثيل learnable للمسافة النسبية. هذا يسمح للنموذج بتعلم patterns تعتمد على المسافة النسبية بين الكلمات وليس على الموضع المطلق فقط، مما يحسن generalization على sequences طويلة ويعزز فهم التسلسل.",
+    "problem": "نحتاج تمثيل الترتيب النسبي للكلمات بشكل أفضل من absolute positions، خصوصًا للتسلسلات الطويلة.",
+    "reference": "Transformer-XL (Dai et al., 2019), T5, relative positional embeddings in Transformers",
+    "category": ["mechanisms"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 19,
+    "type": "Sparsemax Attention",
+    "description": "بديل للـSoftmax يولد توزيع attention متناثر يحتوي على أصفار حقيقية، بحيث يركز النموذج على أهم التوكنات فقط.",
+    "rnnProblem": "في حال استخدام RNN attention، عادة يُستخدم Softmax الذي يعطي probabilities > 0 لكل عنصر، حتى غير المهم، مما يجعل التركيز أقل وضوحًا ويقلل interpretability.",
+    "detailedSolution": "Sparsemax يقوم بعمل Euclidean projection على simplex مشابه لـSoftmax، لكنه ينتج output متناثر (sparse) يحتوي على exact zeros. هذا يعني أن النموذج يركز فقط على أهم tokens ويضع الـattention على الباقي = 0 فعلًا، وليس مجرد قيمة صغيرة. ⚠️ الحسابات أبطأ من Softmax التقليدي، لكن يعطي interpretability أعلى ويسمح بتحديد الكلمات الأكثر أهمية بوضوح.",
+    "problem": "نحتاج اختيار أهم الكلمات فقط في التسلسل والتجاهل الصريح للباقي، لتحسين interpretability والفعالية الحسابية.",
+    "reference": "Sparsemax (Martins & Astudillo, 2016), Sparse Attention Mechanisms",
+    "category": ["mechanisms"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 20,
+    "type": "Grouped Query Attention (GQA)",
+    "description": "مشاركة K/V بين مجموعات من الـqueries، كحل وسط بين Multi-Head Attention التقليدي (MHA) وMulti-Query Attention (MQA)، لتقليل الذاكرة والحسابات.",
+    "rnnProblem": "مش مشكلة في RNN، ده optimization خاص بالـMulti-Head Attention في Transformers لتقليل الذاكرة والـcompute.",
+    "detailedSolution": "في GQA، بدل أن يكون لكل head K,V منفصل (MHA) أو كل الـheads يشاركوا نفس K,V (MQA)، نقسم الـheads إلى مجموعات وكل مجموعة تشارك نفس K,V. مثال: 32 heads و4 groups → 8 K/V pairs بدل 32، ما يوفر حوالي 70% من الذاكرة في KV cache مع الحفاظ على جودة الأداء قريبة جدًا من MHA. هذا يقلل بشكل كبير memory footprint وcompute مع الحفاظ على القدرة على parallel processing لكل head group.",
+    "problem": "نحتاج تقليل استهلاك الذاكرة والحسابات في Multi-Head Attention مع الحفاظ على جودة الأداء.",
+    "reference": "GQA (Ainslie et al., 2023), Llama 2, Mistral, Efficient Multi-Head Attention",
+    "category": ["mechanisms"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 21,
+    "type": "Cross-Attention with Latents (Perceiver)",
+    "description": "ضغط التسلسل الطويل لعدد صغير من latent tokens ثم تطبيق attention عليهم، لتقليل التعقيد الحسابي مع الحفاظ على المعلومات المهمة.",
+    "rnnProblem": "RNN/LSTM بيضغط كل الـsequence في hidden state واحد فقط، مما يؤدي لفقدان كمية كبيرة من المعلومات عند sequences طويلة جدًا.",
+    "detailedSolution": "في Perceiver، نستخدم cross-attention لضغط sequence طويل (n tokens) إلى عدد صغير من latent tokens (m << n). بعد ذلك، نقوم بعمل self-attention فقط على الـlatents، ثم cross-attention لإرجاع المعلومات للـsequence الأصلي إذا لزم الأمر. هذا يقلل التعقيد الحسابي من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(nm + m²)</span>. مثال: n=100,000 وm=512 → توفير هائل في الحسابات والذاكرة مع الحفاظ على دقة التمثيل.",
+    "problem": "نحتاج ضغط sequences طويلة جدًا إلى تمثيل compact وefficient دون فقدان المعلومات المهمة.",
+    "reference": "Perceiver, Perceiver IO (Jaegle et al., 2021), Efficient Attention for Long Sequences",
+    "category": ["mechanisms"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 22,
+    "type": "RoPE (Rotary Position Embedding)",
+    "description": "تمثيل الموضع عبر تدوير الـQ وK في الفضاء المركب بحيث تعتمد الـattention على المسافة النسبية بشكل طبيعي.",
+    "rnnProblem": "RNN/LSTM عنده positional info ضمنية لأنه sequential، لكنها تضيع مع التسلسلات الطويلة، بينما learned absolute embeddings غير قابلة للتعميم (extrapolation) إلى sequences أطول من التدريب.",
+    "detailedSolution": "في RoPE، نطبق rotation matrix على Q وK وفقًا للموضع: <span style='color:green; display: block; direction: ltr; text-align: left;'>f(x,m) = x·e<sup>imθ</sup></span> في الفضاء المركب. نتيجة ذلك، الـinner product بين Q وK يعكس المسافة النسبية بين التوكنات بشكل طبيعي. المميزات: \n- يدعم extrapolation لتسلسلات أطول من التدريب\n- لا يحتاج parameters إضافية\n- يحقق natural decay مع زيادة المسافة بين التوكنات\n- يحافظ على قدرة النموذج على التعامل مع sequences طويلة بكفاءة",
+    "problem": "نحتاج position encoding يعمل مع sequences أطول من التي تم تدريب النموذج عليها دون فقدان المعلومات.",
+    "reference": "RoFormer (Su et al., 2021), LLaMA, GPT-NeoX, Rotary Position Embeddings",
+    "category": ["mechanisms", "positional"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 23,
+    "type": "ALiBi (Attention with Linear Biases)",
+    "description": "إضافة bias خطي بسيط على attention scores حسب المسافة بين التوكنات، بدون استخدام position embeddings تقليدية.",
+    "rnnProblem": "Position embeddings التقليدية تضيف parameters جديدة وصعب extrapolation لتسلسلات أطول من التدريب، بينما RNN لديها معلومات موضعية ضمنية لكنها تضيع مع الـtime.",
+    "detailedSolution": "في ALiBi، بدل position embeddings، نضيف bias خطي لكل pair من التوكنات: <span style='color:green; display: block; direction: ltr; text-align: left;'>score<sub>ij</sub> = q<sub>i</sub>·k<sub>j</sub> - m·|i-j|</span> حيث m هو slope مختلف لكل head. هذا يتيح: \n- عدم الحاجة لأي parameters إضافية\n- دعم extrapolation ممتاز لتسلسلات أطول بكثير من التدريب\n- الحفاظ على simplicity وسرعة الحسابات\nيعمل bias الخطي على تفضيل الانتباه للكلمات الأقرب نسبيًا، مما يحسن generalization دون زيادة حجم النموذج.",
+    "problem": "نحتاج position encoding بسيط جداً، سريع، وقابل للتوسع لتسلسلات أطول من التدريب.",
+    "reference": "ALiBi (Press et al., 2022), BLOOM, MPT, Linear Biases for Transformers",
+    "category": ["mechanisms", "positional"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 24,
+    "type": "Multi-Query Attention (MQA)",
+    "description": "جميع الـheads تشارك نفس K وV، وهي حالة خاصة من GQA، لتقليل استهلاك الذاكرة وتسريع inference.",
+    "rnnProblem": "مش مشكلة في RNN، هذا optimization خاص بالـMulti-Head Attention لتقليل KV cache memory أثناء inference.",
+    "detailedSolution": "في MQA، بدل أن يكون لكل head K,V منفصل، كل الـheads تشترك في single K,V pair واحد. هذا يوفر memory كبير في KV cache (~95%) ويسرع inference بشكل ملحوظ. العيب أنه قد يكون هناك تراجع طفيف في الجودة مقارنة بـMHA، لكن يمكن تعويض ذلك بزيادة dimensionality للـK (d<sub>k</sub>) إذا لزم الأمر. مناسب جدًا للنماذج الكبيرة عند الحاجة إلى decoding سريع على sequences طويلة.",
+    "problem": "نحتاج تقليل KV cache memory بشكل كبير لتسريع inference على sequences طويلة.",
+    "reference": "Fast Transformer Decoding (Shazeer, 2019), PaLM, Efficient Transformer Decoding",
+    "category": ["mechanisms"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 25,
+    "type": "Sliding Window + RoPE (Extended Context)",
+    "description": "دمج sliding window attention مع RoPE للـpositional encoding، لدعم context طويل جدًا بكفاءة عالية.",
+    "rnnProblem": "RNN/LSTM محدود في long context memory، لأنه يعتمد على hidden state متراكم sequentially ويصعب عليه الاحتفاظ بسياق طويل جدًا.",
+    "detailedSolution": "في هذا الأسلوب، نستخدم sliding window attention (مثلاً 4096 tokens) بحيث كل token يركز فقط على tokens محلية ضمن النافذة، مع تطبيق RoPE على Q وK لتضمين positional information بشكل يمكن تعميمه على تسلسلات أطول. يمكن أيضًا إضافة global attention tokens لتغطية أهم العناصر عبر كل السياق. هذا يتيح التعامل مع contexts طويلة جدًا (100k+ tokens) بكفاءة عالية، مع الحفاظ على فهم محلي (local) وعالمي (global).",
+    "problem": "نحتاج context window طويل جدًا مع الحفاظ على الكفاءة الحسابية وفهم local وglobal patterns.",
+    "reference": "Mistral 7B (sliding window), Longformer patterns, Extended Context Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "advanced"
+}, {
+    "id": 26,
+    "type": "Factorized / Axial Attention",
+    "description": "تحليل الانتباه على محاور مختلفة من البيانات (مثلاً: الانتباه على الصفوف أولاً ثم الأعمدة) لتقليل التعقيد الحسابي للبيانات متعددة الأبعاد.",
+    "rnnProblem": "RNN/LSTM مش قادر يستفيد من البنية متعددة الأبعاد للبيانات (مثل الصور أو الفيديو) لأنه يعالج التسلسل بشكل خطي فقط، ويضيع المعلومات الهيكلية الهامة.",
+    "detailedSolution": "في Factorized / Axial Attention، نطبق الانتباه على كل محور من محاور البيانات بشكل منفصل. مثال للصور (H×W): أولاً نطبق الانتباه على كل صف (row-wise) ثم على كل عمود (column-wise). هذا يقلل التعقيد من O(H²W²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(HW(H+W))</span> أي O(n√n) بدل O(n²). هذا الأسلوب يحافظ على العلاقات المكانية بين العناصر مع تقليل هائل في الحسابات، مما يسمح بمعالجة صور أو بيانات عالية الأبعاد بكفاءة.",
+    "problem": "نحتاج معالجة بيانات متعددة الأبعاد (صور، فيديو، جداول) بكفاءة مع الحفاظ على البنية المكانية وتقليل التعقيد الحسابي.",
+    "reference": "Axial Transformer (Ho et al., 2019), Sparse Transformer with factorized patterns",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 27,
+    "type": "Banded / Bandwidth-Limited Attention",
+    "description": "الانتباه يكون فقط ضمن نطاق محدد حول القطر الرئيسي لمصفوفة الانتباه، حيث تعتمد الكلمات بشكل أساسي على الكلمات القريبة منها زمنياً.",
+    "rnnProblem": "RNN/LSTM بطبيعته يتبع هذا النمط (يعتمد على الحالة السابقة) لكن بشكل تسلسلي بطيء، بينما الـattention التقليدي يعطي إمكانية parallel processing مع نفس الفكرة بكفاءة أعلى.",
+    "detailedSolution": "في Banded Attention، نحدد نطاق عرض ثابت b حول القطر الرئيسي، بحيث كل توكن في الموضع i يرى فقط التوكنات من i-b إلى i+b. هذا يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n×b)</span> حيث b ثابت. هذا النمط مثالي للبيانات الزمنية (مثل الصوت، السلاسل الزمنية) حيث تعتمد القيمة الحالية بشكل أساسي على القيم القريبة زمنياً. يمكن توسيع النطاق تدريجياً في طبقات أعمق لالتقاط التبعيات البعيدة.",
+    "problem": "نحتاج معالجة بيانات زمنية حيث الاعتماد الأساسي على العناصر القريبة في الوقت، مع الحفاظ على الكفاءة الحسابية.",
+    "reference": "Music Transformer, WaveNet-style attention, Time Series Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 28,
+    "type": "Hierarchical Attention",
+    "description": "انتباه متعدد المستويات حيث تركز المستويات الدنيا على التفاصيل المحلية والمستويات العليا على الملخصات والتلخيصات العالمية.",
+    "rnnProblem": "RNN/LSTM بيعالج كل المستويات بنفس الطريقة، ولا يستطيع بناء تمثيلات هرمية مجردة للبيانات، مما يحد من قدرته على فهم البنى المعقدة والطويلة.",
+    "detailedSolution": "في Hierarchical Attention، نقوم ببناء تمثيل هرمي للبيانات: \n1. المستوى الأدنى: attention بين الكلمات داخل الجمل\n2. المستوى المتوسط: attention بين الجمل داخل الفقرات\n3. المستوى الأعلى: attention بين الفقرات داخل المستند\nكل مستوى يعمل على ملخص المستوى الأدنى منه. هذا يقلل التعقيد بشكل كبير (من O(n²) إلى مجموع تعقيدات المستويات) ويسمح للنموذج بالتركيز على السياق العالمي والتفاصيل المحلية في نفس الوقت.",
+    "problem": "نحتاج بناء تمثيل هرمي للبيانات الطويلة والمعقدة، مع التركيز على التفاصيل المحلية والسياق العالمي.",
+    "reference": "Hierarchical Attention Networks (Yang et al., 2016), Hierarchical Transformers",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 29,
+    "type": "Star / Star-shaped Attention",
+    "description": "توصيل جميع التوكنات بعنصر مركزي واحد (star token) يرى كل التوكنات، بينما التوكنات ترى فقط العنصر المركزي والتوكنات المجاورة.",
+    "rnnProblem": "RNN/LSTM لا يستطيع توصيل جميع العناصر بعنصر مركزي مباشر، لأن المعلومات يجب أن تمر عبر السلسلة التسلسلية، مما يبطئ انتشار المعلومات المهمة.",
+    "detailedSolution": "في Star Attention، نضيف token مركزي خاص (star token) يقوم بـfull attention مع كل التوكنات في التسلسل. كل توكن عادي يرى فقط: \n1. التوكن المركزي\n2. التوكنات المجاورة ضمن نافذة محلية\nهذا يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n)</span> مع الحفاظ على قدرة جميع التوكنات على التواصل عبر العنصر المركزي. التوكن المركزي يعمل كذاكرة عالمية ووسيط اتصال بين جميع أجزاء التسلسل.",
+    "problem": "نحتاج ربط جميع أجزاء التسلسل بكفاءة عالية مع تقليل التعقيد إلى خطي O(n).",
+    "reference": "Star Transformer (Guo et al., 2019), Central Token Attention",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 30,
+    "type": "Memory Compression / Summary Attention",
+    "description": "ضغط السياق الطويل إلى عدد صغير من خلايا الذاكرة (memory slots) والانتباه لهذه الخلايا بدلاً من السياق الكامل.",
+    "rnnProblem": "RNN/LSTM يحاول ضغط كل السياق في hidden state واحد، مما يؤدي إلى فقدان المعلومات مع التسلسلات الطويلة، حيث لا يمكن للـstate المضغوط الاحتفاظ بكل التفاصيل.",
+    "detailedSolution": "في Memory Compression Attention، نقوم بإنشاء m خلايا ذاكرة (حيث m << n) تمثل ملخصاً للسياق الطويل. العملية تتضمن خطوتين: \n1. Compression: استخدام attention لضغط السياق إلى m خلايا ذاكرة\n2. Retrieval: الانتباه إلى هذه الخلايا عند الحاجة للمعلومات\nهذا يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n×m + m²)</span>، مع الحفاظ على المعلومات المهمة في خلايا الذاكرة المضغوطة.",
+    "problem": "نحتاج معالجة سياقات طويلة جداً (مئات الآلاف من التوكنات) عن طريق ضغطها في تمثيل مكثف وكفء.",
+    "reference": "Compressive Transformer (Rae et al., 2020), Memory Transformer, Summary Attention",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 31,
+    "type": "Sparse Query-Key Attention",
+    "description": "تطبيق التناثر (sparsity) فقط على تفاعلات الـquery-key مع الاحتفاظ بقيم الـvalue كثيفة، لتقليل الحسابات مع الحفاظ على جودة التمثيل.",
+    "rnnProblem": "RNN/LSTM لا يميز بين حسابات الـquery-key والـvalue، وجميع الحسابات تكون مكثفة، مما يزيد من التعقيد الحسابي دون داعٍ.",
+    "detailedSolution": "في Sparse Query-Key Attention، نحسب فقط أهم تفاعلات الـquery-key (مثلاً باستخدام top-k أو patterns محددة) ونضع باقي التفاعلات صفر. لكن نستخدم الـvalues الكثيفة للحصول على التمثيل النهائي. هذا يقلل تعقيد حساب الـattention scores من O(n²) إلى O(kn) حيث k ثابت، بينما يبقى تعقيد ضرب الـattention weights في الـvalues هو O(n²) ولكن مع تقليل كبير في الحسابات الأولية. يمكن دمج هذا مع تقنيات أخرى لتحقيق كفاءة أعلى.",
+    "problem": "نحتاج تقليل حسابات الـquery-key المكلفة مع الحفاظ على جودة تمثيل الـvalues.",
+    "reference": "Sparse Attention Variants, Adaptive Sparse Patterns",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 32,
+    "type": "Adaptive Sparse Attention",
+    "description": "نمط التناثر يتكيف ديناميكياً مع محتوى المدخلات، حيث يقرر النموذج أي الروابط يجب أن تكون نشطة بناءً على السياق الحالي.",
+    "rnnProblem": "RNN/LSTM له مسار ثابت للمعالجة ولا يمكنه تكييف بنيته مع محتوى المدخلات، مما يحد من كفاءته مع الأنماط المختلفة للبيانات.",
+    "detailedSolution": "في Adaptive Sparse Attention، لا نحدد نمط التناثر مسبقاً، بل نستخدم آلية تعلم لاختيار الروابط النشطة ديناميكياً. نضيف شبكة صغيرة (router network) تقرر لأي tokens يجب أن يولي كل query الانتباه. يتم استخدام تقنيات مثل Gumbel-Softmax أو reinforcement learning لجعل هذه العملية قابلة للاشتقاق. هذا يسمح للنموذج بتخصيص موارده الحسابية للمعلومات الأكثر صلة في كل سياق، مما يحسن الكفاءة والفعالية.",
+    "problem": "نحتاج نمط تناثر يتكيف مع محتوى المدخلات، بدلاً من استخدام نمط ثابت مسبقاً.",
+    "reference": "Differentiable Adaptive Computation Time (ACT), Adaptive Sparse Transformers, Dynamic Routing",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 33,
+    "type": "Sparse Factorized / Structured Sparse Attention",
+    "description": "استخدام بنى تناثر منظمة مسبقاً (مثل شبكات المنتج أو أنماط هندسية محددة) يتم تحليلها على محاور متعددة لتحقيق كفاءة حسابية عالية.",
+    "rnnProblem": "RNN/LSTM لا يدعم بنى حسابية معقدة ومنظمة، لأن بنيته التسلسلية البسيطة لا تسمح بتطبيق تحليلات متعددة المحاور أو أنماط هندسية معقدة.",
+    "detailedSolution": "في Sparse Factorized Attention، نستخدم أنماط تناثر منظمة مسبقاً يتم تحليلها على محاور متعددة. مثال: نطبق attention على منتج tensor (T = A × B × C) حيث كل عامل يمثل بعداً من الأبعاد. هذا يقلل التعقيد من O(n^d) إلى مجموع تعقيدات العوامل <span style='color:green; display: inline-block; direction: ltr;'>O(∑ n_i²)</span> حيث n_i هو حجم كل بعد. يتم تصميم هذه الأنماط هندسياً لالتقاط التبعيات المكانية أو الزمنية المهمة مع تقليل الحسابات غير الضرورية.",
+    "problem": "نحتاج أنماط تناثر منظمة ومحللة هندسياً لبيانات عالية الأبعاد ذات بنية معقدة.",
+    "reference": "Structured Sparse Transformers, Tensor Product Attention, Geometric Sparse Patterns",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 34,
+    "type": "Axial Attention",
+    "description": "انتباه يُطبق على كل بعد من أبعاد البيانات بشكل منفصل، لاستغلال البنية متعددة الأبعاد دون زيادة كبيرة في التعقيد الحسابي.",
+    "rnnProblem": "RNN/LSTM مش مصمم للتعامل مع البيانات متعددة الأبعاد، عادة بيحولها إلى 1D sequence وبالتالي بيضيع البنية المكانية أو الزمنية للبيانات.",
+    "detailedSolution": "في Axial Attention، نطبق الانتباه على كل بعد من أبعاد البيانات بشكل منفصل. مثال للصور (H×W): بدل عمل attention على كل الـpixels مرة واحدة (O(H²W²))، نقوم أولاً بالـattention على كل row (O(HW²)) ثم على كل column (O(H²W)). بذلك يصبح التعقيد الكلي <span style='color:green; display: inline-block; direction: ltr;'>O(HW(H+W))</span> بدل O(H²W²). نفس الفكرة يمكن تطبيقها على بيانات 3D (مثل الفيديو) بحيث نطبق attention على time×height×width بشكل منفصل لكل بعد.",
+    "problem": "نحتاج معالجة بيانات متعددة الأبعاد (صور، فيديو، أو أي tensor عالي الأبعاد) بكفاءة مع الحفاظ على العلاقات المكانية أو الزمنية.",
+    "reference": "Axial Transformer (Ho et al., 2019), Axial-DeepLab",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}, {
+    "id": 35,
+    "type": "Hierarchical Attention",
+    "description": "انتباه متعدد المستويات (coarse-to-fine) يسمح للنموذج بالتركيز على السياق العالمي والجزئيات المحلية في نفس الوقت.",
+    "rnnProblem": "RNN/LSTM بيعالج كل tokens بنفس المستوى، وما بيقدرش يمثل hierarchy أو مستويات مختلفة من التجريد داخل النص أو البيانات الطويلة.",
+    "detailedSolution": "في Hierarchical Attention، نقسم البيانات أو النصوص إلى مستويات: \n- أول مستوى: chunks كبيرة (document-level) لتحديد السياق العام.\n- ثاني مستوى: paragraphs لتحديد السياق المتوسط.\n- ثالث مستوى: sentences أو tokens لتحديد التفاصيل الدقيقة.\nبهذا الشكل، يمكن للنموذج رؤية الـglobal context والـlocal details في نفس الوقت باستخدام بنية هرمية، مما يحسن القدرة على تمثيل المعلومات الطويلة والمعقدة.",
+    "problem": "نحتاج أن يكون الانتباه على مستويات مختلفة من التجريد، بحيث نستفيد من السياق العالمي والجزئيات المحلية معًا.",
+    "reference": "Hierarchical Attention Networks (Yang et al., 2016), multi-level attention models",
+    "category": ["mechanisms", "sparse"],
+    "classification": "mechanism",
+    "classificationType": "sparse"
+}];
 
 
-            ,
-
-
-            {
-                "id": 5,
-                "type": "Causal (Masked) Attention",
-                "description": "قناع ثلاثي سفلي (lower triangular mask) يمنع كل كلمة من رؤية الكلمات المستقبلية في نفس التسلسل، مما يضمن توليد نص خطوة خطوة.",
-                "rnnProblem": "RNN/LSTM بطبيعته causal، أي كل خطوة تعتمد على السابقة فقط، لكنه بطيء جدًا لأنه بيعالج الكلمات sequential وما بيدعم parallel processing.",
-                "detailedSolution": "Causal Attention بيطبق mask مثلثي على الـattention scores قبل الـsoftmax بحيث أي كلمة في position i تشوف فقط positions ≤ i: <span style='color:green; display: block; direction: ltr; text-align: left;'>mask[i,j] = -∞ if j > i</span>. ده يسمح للنموذج بعدم الاطلاع على المستقبل أثناء التدريب أو التوليد، وفي نفس الوقت **يسمح بالـparallel training** على كامل التسلسل بفضل آلية الـSelf-Attention masked.",
-                "problem": "محتاجين توليد نص خطوة خطوة (auto-regressive) من غير ما الكلمة الحالية تبص على الكلمات المستقبلية.",
-                "reference": "GPT series, LLaMA, Transformer Decoder للنمذجة التوليدية، أي نموذج autoregressive.",
-                "category": ["mechanisms", "basic"],
-                "classification": "mechanism",
-                "classificationType": "basic"
-            }, {
-                "id": 6,
-                "type": "Local / Sliding Window Attention",
-                "description": "الانتباه يكون ضمن نافذة محدودة حول كل توكن، بحيث كل كلمة ترى فقط مجموعة محددة من الكلمات القريبة بدل كل التسلسل.",
-                "rnnProblem": "RNN/LSTM بيعالج كل التسلسل بالكامل حتى لو المعلومات المهمة قريبة، وده غير فعال خصوصًا للتسلسلات الطويلة (inefficient).",
-                "detailedSolution": "في Local / Sliding Window Attention، كل token بيشوف فقط نافذة محددة حوله (مثلاً ±256 tokens). ده يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n×w)</span> حيث w حجم النافذة الثابت، مع الحفاظ على السياق المحلي. يمكن دمجه مع global attention لتغطية الـlong-range dependencies إذا احتجنا، مما يعطي توازن بين الكفاءة والقدرة على التعامل مع التسلسلات الطويلة.",
-                "problem": "نحتاج نركز على السياق المحلي بكفاءة عالية، مع تقليل التعقيد الحسابي بالنسبة للتسلسلات الطويلة.",
-                "reference": "Longformer (2020), Sparse Transformer, BigBird",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }
-
-            , {
-                "id": 7,
-                "type": "Strided / Dilated Attention",
-                "description": "الانتباه يتم عبر خطوات متباعدة (كل k توكن)، بحيث كل كلمة ترى كلمات متباعدة بدلاً من كل التسلسل.",
-                "rnnProblem": "RNN/LSTM لازم يمر على كل الـsteps عشان يوصل لمعلومة بعيدة، وده بيضعف gradient ويبطئ التعلم، خصوصًا مع التسلسلات الطويلة.",
-                "detailedSolution": "في Strided / Dilated Attention، كل token يشوف فقط كل k tokens (stride = k) بدلاً من كل الكلمات. ده يسمح للنموذج بالوصول للمسافات البعيدة بتكلفة أقل: <span style='color:green; display: inline-block; direction: ltr;'>O(n²/k)</span>. يمكن استخدام عدة strides مختلفة عبر layers متعددة لتعلم multi-scale patterns، بحيث النموذج يلتقط العلاقات القصيرة والطويلة بكفاءة عالية.",
-                "problem": "نحتاج الوصول إلى كلمات بعيدة في التسلسل بتكلفة أقل من O(n²)، مع الحفاظ على capture للـlong-range dependencies.",
-                "reference": "Sparse Transformer (OpenAI, 2019), Long-Range Transformer",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }
-
-
-            , {
-                "id": 8,
-                "type": "Global Attention",
-                "description": "توكنات محددة (special tokens) قادرة على رؤية كل التسلسل بأكمله، والعكس صحيح، بينما باقي التوكنات تعمل Local Attention.",
-                "rnnProblem": "RNN/LSTM مفيهوش فكرة global tokens، كل المعلومات لازم تمر عبر الـhidden state المضغوط، وده ممكن يضعف أو ينسى المعلومات الطويلة.",
-                "detailedSolution": "في Global Attention، نحدد بعض الـtokens (مثل [CLS] أو أول token في كل paragraph) بحيث تعمل full attention لكل التسلسل، والعكس صحيح: أي كلمة في التسلسل يمكنها التواصل مع هذه الـglobal tokens. ده يجعلها بمثابة global memory متاحة من أي مكان في التسلسل، بينما باقي التوكنات تتعامل ضمن local context فقط، مما يقلل التعقيد الحسابي مقارنة بالـfull attention لكل التوكنات، ويحافظ على القدرة على الوصول إلى معلومات مهمة عبر التسلسل.",
-                "problem": "نحتاج أن بعض الـtokens المهمة ترى كل الكلمات في التسلسل والعكس، مثل حالات الـclassification أو summarization.",
-                "reference": "Longformer (2020), BigBird (2020), أي نموذج sparse attention يستخدم global tokens.",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }
-
-
-            , {
-                "id": 9,
-                "type": "Random Attention",
-                "description": "كل توكن يختار عدد ثابت من التوكنات الأخرى بشكل عشوائي للانتباه إليها، لتوفير تنوع وتغطية إضافية في المعلومات.",
-                "rnnProblem": "RNN/LSTM بيتبع نفس المسار دائمًا أثناء معالجة التسلسل، وما بيحتويش على randomness طبيعي، وده ممكن يقلل التعميم ويزيد overfitting للـpatterns المحددة.",
-                "detailedSolution": "في Random Attention، كل token يختار r tokens عشوائية للانتباه إليها باستخدام random sampling مع fixed seed لضمان reproducibility. ده بيكسر التماثل بين المسارات المختلفة، يمنع overfitting، ويسمح للمعلومات بالانتشار عبر network عبر مسارات متنوعة. يمكن دمجه مع Local أو Global Attention لتغطية كل التسلسل بكفاءة مع إضافة diversity.",
-                "problem": "نحتاج إضافة diversity للانتباه ومنع overfitting للـpatterns المحددة، مع تحسين انتشار المعلومات عبر الشبكة.",
-                "reference": "BigBird (2020), Sparse Transformer, أي نموذج Sparse Attention يستخدم random connections.",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }
-
-
-            , {
-                "id": 10,
-                "type": "Block / Chunked Attention",
-                "description": "تقسيم التسلسل إلى كتل (blocks) والانتباه داخل كل block وبين الكتل المجاورة، لتقليل التعقيد مع الحفاظ على السياق المحلي والمتجاور.",
-                "rnnProblem": "RNN/LSTM بيعالج التسلسل كله خطوة خطوة، وده بيصعب التعامل مع sequences طويلة جدًا ويزيد الوقت اللازم للحساب.",
-                "detailedSolution": "في Block / Chunked Attention، نقسم الـsequence إلى blocks (مثلاً كل block = 64 tokens). نقوم بعمل attention داخل كل block بالإضافة إلى attention بين blocks المجاورة لضمان continuity. هذا يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n²/b)</span> حيث b حجم block. يمكن استخدام blocks متداخلة (overlapping) لضمان عدم فقدان السياق عند الحدود بين blocks.",
-                "problem": "نحتاج معالجة sequences طويلة بكفاءة عن طريق تقسيمها إلى كتل مع الحفاظ على الربط بين الكلمات المتجاورة.",
-                "reference": "BigBird (2020), Block-Sparse Attention, Long-Range Transformers",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }
-
-
-            , {
-                "id": 11,
-                "type": "Fixed Patterns Attention",
-                "description": "استخدام أنماط انتباه ثابتة محددة مسبقًا (مثل الصفوف، الأعمدة، أو الأقطار) لاستغلال البنية الطبيعية للبيانات المنظمة هندسياً.",
-                "rnnProblem": "RNN/LSTM مش قادر يستفيد من البنية الهندسية للبيانات (مثل الصور 2D أو الجداول)، لأنه يعالج التسلسل بشكل linear فقط ويضيع المعلومات الهيكلية.",
-                "detailedSolution": "في Fixed Patterns Attention، نحدد patterns محددة مسبقًا مثل: \n- row attention: كل عنصر يشوف العناصر في نفس الصف\n- column attention: كل عنصر يشوف العناصر في نفس العمود\n- diagonal attention: كل عنصر يشوف العناصر على القطر\nهذه الأنماط تستغل البنية الطبيعية للبيانات المنظمة، وتقلل التعقيد الحسابي بشكل كبير مقارنة بالـfull attention لجميع العناصر، مع الحفاظ على المعلومات الهيكلية المهمة.",
-                "problem": "نحتاج استخدام patterns ثابتة محددة مسبقًا لتقليل التعقيد الحسابي (sparsity) والاستفادة من البنية الهندسية للبيانات.",
-                "reference": "Sparse Transformer (OpenAI, 2019), Long-Range Sparse Transformers",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }, {
-                "id": 12,
-                "type": "Sparse Top-K Attention",
-                "description": "كل token يركز على أعلى K قيم من attention scores فقط بشكل ديناميكي، مما يقلل الحسابات ويركز على العناصر الأهم.",
-                "rnnProblem": "RNN/LSTM بيدي نفس الاهتمام لكل الـsteps، ومش بيركز على أهم العناصر في التسلسل، مما يقلل الكفاءة خصوصًا للتسلسلات الطويلة.",
-                "detailedSolution": "في Sparse Top-K Attention، نحسب كل attention scores أولاً، ثم نأخذ فقط أعلى K قيم ونضع باقي القيم = 0 قبل تطبيق softmax. هذا يسمح للنموذج بالتركيز على أهم K tokens بشكل adaptive حسب محتوى التسلسل. ⚠️ للـbackward pass، يمكن استخدام straight-through estimator أو softmax مع temperature للحفاظ على differentiability أثناء التدريب.",
-                "problem": "نحتاج تقليل الحسابات على التسلسل الطويل والتركيز فقط على أهم الكلمات أو العناصر في الـsequence.",
-                "reference": "Top-K Sparse Attention (Adaptive Sparsity), Long-Range Transformers",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }, {
-                "id": 13,
-                "type": "LSH (Locality Sensitive Hashing) Attention",
-                "description": "تقريب التشابه بين التوكنات عبر hashing لتجميع التوكنات المتشابهة معًا، بحيث يتم عمل attention فقط ضمن التوكنات المتشابهة.",
-                "rnnProblem": "RNN/LSTM لازم يعالج كل التسلسل خطوة خطوة، حتى لو فيه tokens متشابهة يمكن تجميعهم، مما يزيد الوقت والتعقيد الحسابي مع التسلسلات الطويلة.",
-                "detailedSolution": "في LSH Attention، نستخدم Locality Sensitive Hashing لتحويل الـqueries والـkeys إلى hash buckets. التوكنات التي تقع في نفس الـbucket أو في buckets مجاورة تقوم بعمل attention مع بعضها فقط. هذا يقلل التعقيد الحسابي من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n log n)</span> في المتوسط، مع الحفاظ على قدرة النموذج على التركيز على التوكنات المتشابهة بشكل فعال.",
-                "problem": "نحتاج العثور على التوكنات المتشابهة بسرعة والعمل عليها فقط، لتسريع الانتباه في التسلسلات الطويلة.",
-                "reference": "Reformer (Kitaev et al., 2020), Long-Range Transformers",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }, {
-                "id": 14,
-                "type": "Clustering-Based Attention",
-                "description": "تجميع التوكنات المتشابهة معًا (semantically) والانتباه داخل كل مجموعة (cluster) لتقليل الحسابات مع الحفاظ على تمثيل العلاقات المهمة.",
-                "rnnProblem": "RNN/LSTM مش قادر يجمع tokens متشابهة semantically، لأنه يعالج التسلسل خطوة خطوة وما بيستفيد من البنية الدلالية بين الكلمات.",
-                "detailedSolution": "في Clustering-Based Attention، نستخدم soft clustering على keys/queries باستخدام learnable cluster centers. كل cluster يعمل attention داخليًا (internal attention)، ويمكن إضافة cross-cluster attention محدود إذا احتجنا لربط المعلومات بين المجموعات. soft assignment يُنفذ عادةً باستخدام Gumbel-Softmax أو تقنيات مشابهة لضمان differentiability أثناء التدريب، بدل hard K-means assignment. هذا يقلل التعقيد الحسابي ويعطي قدرة النموذج على التركيز على التوكنات المتشابهة semantically.",
-                "problem": "نحتاج تجميع tokens متشابهة semantically والانتباه داخل كل مجموعة لتقليل الحسابات وتحسين التعلم.",
-                "reference": "Clustered Attention, Routing Transformers (2020), Long-Range Transformers",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }, {
-                "id": 15,
-                "type": "Axial Attention",
-                "description": "انتباه يُطبق على كل بعد من أبعاد البيانات بشكل منفصل، لاستغلال البنية متعددة الأبعاد دون زيادة كبيرة في التعقيد الحسابي.",
-                "rnnProblem": "RNN/LSTM مش مصمم للتعامل مع البيانات متعددة الأبعاد، عادة بيحولها إلى 1D sequence وبالتالي بيضيع البنية المكانية أو الزمنية للبيانات.",
-                "detailedSolution": "في Axial Attention، نطبق الانتباه على كل بعد من أبعاد البيانات بشكل منفصل. مثال للصور (H×W): بدل عمل attention على كل الـpixels مرة واحدة (O(H²W²))، نقوم أولاً بالـattention على كل row (O(HW²)) ثم على كل column (O(H²W)). بذلك يصبح التعقيد الكلي <span style='color:green; display: inline-block; direction: ltr;'>O(HW(H+W))</span> بدل O(H²W²). نفس الفكرة يمكن تطبيقها على بيانات 3D (مثل الفيديو) بحيث نطبق attention على time×height×width بشكل منفصل لكل بعد.",
-                "problem": "نحتاج معالجة بيانات متعددة الأبعاد (صور، فيديو، أو أي tensor عالي الأبعاد) بكفاءة مع الحفاظ على العلاقات المكانية أو الزمنية.",
-                "reference": "Axial Transformer (Ho et al., 2019), Axial-DeepLab",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            }, {
-                "id": 16,
-                "type": "Hierarchical Attention",
-                "description": "انتباه متعدد المستويات (coarse-to-fine) يسمح للنموذج بالتركيز على السياق العالمي والجزئيات المحلية في نفس الوقت.",
-                "rnnProblem": "RNN/LSTM بيعالج كل tokens بنفس المستوى، وما بيقدرش يمثل hierarchy أو مستويات مختلفة من التجريد داخل النص أو البيانات الطويلة.",
-                "detailedSolution": "في Hierarchical Attention، نقسم البيانات أو النصوص إلى مستويات: \n- أول مستوى: chunks كبيرة (document-level) لتحديد السياق العام.\n- ثاني مستوى: paragraphs لتحديد السياق المتوسط.\n- ثالث مستوى: sentences أو tokens لتحديد التفاصيل الدقيقة.\nبهذا الشكل، يمكن للنموذج رؤية الـglobal context والـlocal details في نفس الوقت باستخدام بنية هرمية، مما يحسن القدرة على تمثيل المعلومات الطويلة والمعقدة.",
-                "problem": "نحتاج أن يكون الانتباه على مستويات مختلفة من التجريد، بحيث نستفيد من السياق العالمي والجزئيات المحلية معًا.",
-                "reference": "Hierarchical Attention Networks (Yang et al., 2016), multi-level attention models",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            }
-
-
-            , {
-                "id": 17,
-                "type": "Learnable Sparse Patterns",
-                "description": "تعلم أنماط التناثر (sparsity) أثناء التدريب بطريقة قابلة للاشتقاق، بحيث يقرر النموذج بنفسه أي الـconnections يجب أن تكون فعالة وأيها تُعطَّل.",
-                "rnnProblem": "RNN/LSTM مش sparse بطبيعته، بيعالج كل العناصر في التسلسل بنفس الطريقة ولا يميز بين المهم وغير المهم، مما يزيد التعقيد الحسابي ويحد من الكفاءة.",
-                "detailedSolution": "في Learnable Sparse Patterns، نضيف learnable mask parameters على مصفوفة الـattention. خلال التدريب، الـmask يتعلم أن يجعل بعض الـconnections = 0 لتقليل التعقيد والتركيز على العلاقات المهمة. يتم استخدام Gumbel-Softmax أو Concrete distribution لضمان differentiability، ويمكن إضافة L0 regularization لتشجيع sparsity. بهذه الطريقة، الـsparsity pattern نفسه يتعلم من البيانات بطريقة adaptive وفعالة.",
-                "problem": "نحتاج أن يتعلم النموذج نفسه أنماط sparsity المناسبة من البيانات، بدل تحديدها يدوياً.",
-                "reference": "Dynamic Sparse Attention, Differentiable Masking, Learnable Sparse Transformers",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "sparse"
-            }
-
-
-            , {
-                "id": 18,
-                "type": "Linear Attention",
-                "description": "استخدام Kernel Trick لتحويل التعقيد الحسابي من O(n²) إلى خطي O(n)، مع الحفاظ على القدرة على parallel processing.",
-                "rnnProblem": "RNN/LSTM خطي O(n) لكن sequential، بينما Self-Attention التقليدي O(n²) لكنه parallelizable، لذلك نحتاج مزيج من كفاءة الـRNN وخواص الـAttention.",
-                "detailedSolution": "في Linear Attention، نستخدم kernel trick: <span style='color:green; display: block; direction: ltr; text-align: left;'>φ(Q)(φ(K)<sup>T</sup>V)</span> بدل <span style='color:green; display: block; direction: ltr; text-align: left;'>(QK<sup>T</sup>)V</span>. أولاً نحسب (φ(K)<sup>T</sup>V) بتعقيد O(nd²)، ثم نضرب φ(Q) في النتيجة O(nd²). بالتالي يصبح التعقيد الكلي <span style='color:green; display: inline-block; direction: ltr;'>O(nd²) ≈ O(n)</span> للـd ثابت، مع إمكانية parallel processing على كامل التسلسل، مما يجمع بين السرعة والكفاءة الحسابية.",
-                "problem": "نحتاج تقليل التعقيد من O(n²) إلى O(n) مع الاحتفاظ بالقدرة على parallel processing في تسلسلات طويلة.",
-                "reference": "Linear Transformer (Katharopoulos et al., 2020), Kernel-based Attention, Efficient Transformers",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            },
-
-            {
-                "id": 19,
-                "type": "Performer Attention",
-                "description": "تقريب Self-Attention باستخدام Random Feature Mapping (FAVOR+) لتقليل التعقيد الحسابي مع الحفاظ على دقة عالية.",
-                "rnnProblem": "RNN/LSTM تواجه نفس المشكلة: sequential processing أو Self-Attention التقليدي O(n²)، مما يصعب التعامل مع sequences طويلة جدًا.",
-                "detailedSolution": "في Performer Attention، نستخدم random Fourier features عبر FAVOR+ algorithm لتقريب softmax kernel: <span style='color:green; display: block; direction: ltr; text-align: left;'>softmax(QK<sup>T</sup>/√d) ≈ φ(Q)φ(K)<sup>T</sup></span> حيث φ هي positive random features. هذا يسمح بحساب attention بتعقيد O(n) بدل O(n²)، مع الحفاظ على unbiased approximation للـsoftmax attention، وبالتالي يمكن التعامل مع sequences طويلة جدًا بكفاءة عالية.",
-                "problem": "نحتاج scalable Self-Attention لتسلسلات طويلة جدًا مع الحفاظ على دقة الـsoftmax التقليدية.",
-                "reference": "Performer (Choromanski et al., 2021), FAVOR+ algorithm, Efficient Transformers",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            },
-
-
-
-            {
-                "id": 20,
-                "type": "Relative Positional Attention",
-                "description": "إضافة تحيز يعتمد على المسافة النسبية بين التوكنات، بحيث يتمكن النموذج من التعلم بناءً على المسافة بين الكلمات بدل الـabsolute positions فقط.",
-                "rnnProblem": "RNN/LSTM عنده معلومات positional ضمنية لأنه sequential، لكن مع مرور الوقت (long sequences) هذه المعلومات بتضعف أو تُنسى، خصوصًا للسياق الطويل.",
-                "detailedSolution": "في Relative Positional Attention، بدل استخدام absolute position embeddings، نضيف bias على attention scores حسب المسافة النسبية بين التوكنات (i-j): <span style='color:green; display: block; direction: ltr; text-align: left;'>score<sub>ij</sub> = q<sub>i</sub>·k<sub>j</sub> + q<sub>i</sub>·r<sub>(i-j)</sub></span> حيث r هو تمثيل learnable للمسافة النسبية. هذا يسمح للنموذج بتعلم patterns تعتمد على المسافة النسبية بين الكلمات وليس على الموضع المطلق فقط، مما يحسن generalization على sequences طويلة ويعزز فهم التسلسل.",
-                "problem": "نحتاج تمثيل الترتيب النسبي للكلمات بشكل أفضل من absolute positions، خصوصًا للتسلسلات الطويلة.",
-                "reference": "Transformer-XL (Dai et al., 2019), T5, relative positional embeddings in Transformers",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            }
-
-
-            ,
-
-            {
-                "id": 21,
-                "type": "Sparsemax Attention",
-                "description": "بديل للـSoftmax يولد توزيع attention متناثر يحتوي على أصفار حقيقية، بحيث يركز النموذج على أهم التوكنات فقط.",
-                "rnnProblem": "في حال استخدام RNN attention، عادة يُستخدم Softmax الذي يعطي probabilities > 0 لكل عنصر، حتى غير المهم، مما يجعل التركيز أقل وضوحًا ويقلل interpretability.",
-                "detailedSolution": "Sparsemax يقوم بعمل Euclidean projection على simplex مشابه لـSoftmax، لكنه ينتج output متناثر (sparse) يحتوي على exact zeros. هذا يعني أن النموذج يركز فقط على أهم tokens ويضع الـattention على الباقي = 0 فعلًا، وليس مجرد قيمة صغيرة. ⚠️ الحسابات أبطأ من Softmax التقليدي، لكن يعطي interpretability أعلى ويسمح بتحديد الكلمات الأكثر أهمية بوضوح.",
-                "problem": "نحتاج اختيار أهم الكلمات فقط في التسلسل والتجاهل الصريح للباقي، لتحسين interpretability والفعالية الحسابية.",
-                "reference": "Sparsemax (Martins & Astudillo, 2016), Sparse Attention Mechanisms",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            },
 
 
 
 
 
-            {
-                "id": 22,
-                "type": "Grouped Query Attention (GQA)",
-                "description": "مشاركة K/V بين مجموعات من الـqueries، كحل وسط بين Multi-Head Attention التقليدي (MHA) وMulti-Query Attention (MQA)، لتقليل الذاكرة والحسابات.",
-                "rnnProblem": "مش مشكلة في RNN، ده optimization خاص بالـMulti-Head Attention في Transformers لتقليل الذاكرة والـcompute.",
-                "detailedSolution": "في GQA، بدل أن يكون لكل head K,V منفصل (MHA) أو كل الـheads يشاركوا نفس K,V (MQA)، نقسم الـheads إلى مجموعات وكل مجموعة تشارك نفس K,V. مثال: 32 heads و4 groups → 8 K/V pairs بدل 32، ما يوفر حوالي 70% من الذاكرة في KV cache مع الحفاظ على جودة الأداء قريبة جدًا من MHA. هذا يقلل بشكل كبير memory footprint وcompute مع الحفاظ على القدرة على parallel processing لكل head group.",
-                "problem": "نحتاج تقليل استهلاك الذاكرة والحسابات في Multi-Head Attention مع الحفاظ على جودة الأداء.",
-                "reference": "GQA (Ainslie et al., 2023), Llama 2, Mistral, Efficient Multi-Head Attention",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            }
-
-            ,
-
-
-            {
-                "id": 23,
-                "type": "Cross-Attention with Latents (Perceiver)",
-                "description": "ضغط التسلسل الطويل لعدد صغير من latent tokens ثم تطبيق attention عليهم، لتقليل التعقيد الحسابي مع الحفاظ على المعلومات المهمة.",
-                "rnnProblem": "RNN/LSTM بيضغط كل الـsequence في hidden state واحد فقط، مما يؤدي لفقدان كمية كبيرة من المعلومات عند sequences طويلة جدًا.",
-                "detailedSolution": "في Perceiver، نستخدم cross-attention لضغط sequence طويل (n tokens) إلى عدد صغير من latent tokens (m << n). بعد ذلك، نقوم بعمل self-attention فقط على الـlatents، ثم cross-attention لإرجاع المعلومات للـsequence الأصلي إذا لزم الأمر. هذا يقلل التعقيد الحسابي من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(nm + m²)</span>. مثال: n=100,000 وm=512 → توفير هائل في الحسابات والذاكرة مع الحفاظ على دقة التمثيل.",
-                "problem": "نحتاج ضغط sequences طويلة جدًا إلى تمثيل compact وefficient دون فقدان المعلومات المهمة.",
-                "reference": "Perceiver, Perceiver IO (Jaegle et al., 2021), Efficient Attention for Long Sequences",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            }, {
-                "id": 24,
-                "type": "RoPE (Rotary Position Embedding)",
-                "description": "تمثيل الموضع عبر تدوير الـQ وK في الفضاء المركب بحيث تعتمد الـattention على المسافة النسبية بشكل طبيعي.",
-                "rnnProblem": "RNN/LSTM عنده positional info ضمنية لأنه sequential، لكنها تضيع مع التسلسلات الطويلة، بينما learned absolute embeddings غير قابلة للتعميم (extrapolation) إلى sequences أطول من التدريب.",
-                "detailedSolution": "في RoPE، نطبق rotation matrix على Q وK وفقًا للموضع: <span style='color:green; display: block; direction: ltr; text-align: left;'>f(x,m) = x·e<sup>imθ</sup></span> في الفضاء المركب. نتيجة ذلك، الـinner product بين Q وK يعكس المسافة النسبية بين التوكنات بشكل طبيعي. المميزات: \n- يدعم extrapolation لتسلسلات أطول من التدريب\n- لا يحتاج parameters إضافية\n- يحقق natural decay مع زيادة المسافة بين التوكنات\n- يحافظ على قدرة النموذج على التعامل مع sequences طويلة بكفاءة",
-                "problem": "نحتاج position encoding يعمل مع sequences أطول من التي تم تدريب النموذج عليها دون فقدان المعلومات.",
-                "reference": "RoFormer (Su et al., 2021), LLaMA, GPT-NeoX, Rotary Position Embeddings",
-                "category": ["mechanisms", "positional"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            },
-
-            {
-                "id": 25,
-                "type": "ALiBi (Attention with Linear Biases)",
-                "description": "إضافة bias خطي بسيط على attention scores حسب المسافة بين التوكنات، بدون استخدام position embeddings تقليدية.",
-                "rnnProblem": "Position embeddings التقليدية تضيف parameters جديدة وصعب extrapolation لتسلسلات أطول من التدريب، بينما RNN لديها معلومات موضعية ضمنية لكنها تضيع مع الـtime.",
-                "detailedSolution": "في ALiBi، بدل position embeddings، نضيف bias خطي لكل pair من التوكنات: <span style='color:green; display: block; direction: ltr; text-align: left;'>score<sub>ij</sub> = q<sub>i</sub>·k<sub>j</sub> - m·|i-j|</span> حيث m هو slope مختلف لكل head. هذا يتيح: \n- عدم الحاجة لأي parameters إضافية\n- دعم extrapolation ممتاز لتسلسلات أطول بكثير من التدريب\n- الحفاظ على simplicity وسرعة الحسابات\nيعمل bias الخطي على تفضيل الانتباه للكلمات الأقرب نسبيًا، مما يحسن generalization دون زيادة حجم النموذج.",
-                "problem": "نحتاج position encoding بسيط جداً، سريع، وقابل للتوسع لتسلسلات أطول من التدريب.",
-                "reference": "ALiBi (Press et al., 2022), BLOOM, MPT, Linear Biases for Transformers",
-                "category": ["mechanisms", "positional"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            },
-
-
-            {
-                "id": 26,
-                "type": "Multi-Query Attention (MQA)",
-                "description": "جميع الـheads تشارك نفس K وV، وهي حالة خاصة من GQA، لتقليل استهلاك الذاكرة وتسريع inference.",
-                "rnnProblem": "مش مشكلة في RNN، هذا optimization خاص بالـMulti-Head Attention لتقليل KV cache memory أثناء inference.",
-                "detailedSolution": "في MQA، بدل أن يكون لكل head K,V منفصل، كل الـheads تشترك في single K,V pair واحد. هذا يوفر memory كبير في KV cache (~95%) ويسرع inference بشكل ملحوظ. العيب أنه قد يكون هناك تراجع طفيف في الجودة مقارنة بـMHA، لكن يمكن تعويض ذلك بزيادة dimensionality للـK (d<sub>k</sub>) إذا لزم الأمر. مناسب جدًا للنماذج الكبيرة عند الحاجة إلى decoding سريع على sequences طويلة.",
-                "problem": "نحتاج تقليل KV cache memory بشكل كبير لتسريع inference على sequences طويلة.",
-                "reference": "Fast Transformer Decoding (Shazeer, 2019), PaLM, Efficient Transformer Decoding",
-                "category": ["mechanisms"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            },
 
 
 
 
-            {
-                "id": 27,
-                "type": "Sliding Window + RoPE (Extended Context)",
-                "description": "دمج sliding window attention مع RoPE للـpositional encoding، لدعم context طويل جدًا بكفاءة عالية.",
-                "rnnProblem": "RNN/LSTM محدود في long context memory، لأنه يعتمد على hidden state متراكم sequentially ويصعب عليه الاحتفاظ بسياق طويل جدًا.",
-                "detailedSolution": "في هذا الأسلوب، نستخدم sliding window attention (مثلاً 4096 tokens) بحيث كل token يركز فقط على tokens محلية ضمن النافذة، مع تطبيق RoPE على Q وK لتضمين positional information بشكل يمكن تعميمه على تسلسلات أطول. يمكن أيضًا إضافة global attention tokens لتغطية أهم العناصر عبر كل السياق. هذا يتيح التعامل مع contexts طويلة جدًا (100k+ tokens) بكفاءة عالية، مع الحفاظ على فهم محلي (local) وعالمي (global).",
-                "problem": "نحتاج context window طويل جدًا مع الحفاظ على الكفاءة الحسابية وفهم local وglobal patterns.",
-                "reference": "Mistral 7B (sliding window), Longformer patterns, Extended Context Transformers",
-                "category": ["mechanisms", "sparse"],
-                "classification": "mechanism",
-                "classificationType": "advanced"
-            }
 
 
 
 
-        ];
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        // const attentionMechanisms = [{
+        //         "id": 1,
+        //         "type": "Basic Attention",
+        //         "description": "الانتباه الأساسي - طريقة تحسين على RNN/LSTM التقليدي لربط كل كلمة بكل الكلمات الأخرى في التسلسل.",
+        //         "rnnProblem": "RNN/LSTM بتعالج الكلمات واحدة واحدة، فلما يوصل لآخر الجملة بينسى أول الجملة بسبب مشكلة vanishing gradient، وما بيقدرش يربط كلمات بعيدة بسهولة.",
+        //         "detailedSolution": "Basic Attention بيضيف آلية تخلي كل خطوة في الـdecoder تقدر 'تشوف' كل hidden states للـencoder، بدل ما تعتمد بس على آخر hidden state. العملية تعتمد على ثلاث مكونات رئيسية: Q (Query) من الـdecoder، K (Key) وV (Value) من الـencoder. بيتم حساب تشابه كل Q مع كل K للحصول على weights، والـweights دي بتتطبق على الـV لتكوين context vector لكل خطوة. ده بيخلي النموذج يربط كلمات بعيدة بسهولة ويقلل مشكلة نسيان المعلومات القديمة. ⚠️ ملحوظة: التعقيد عادة O(n*m) حيث n طول الـdecoder و m طول الـencoder، مش كما في self-attention داخل نفس التسلسل.",
+        //         "problem": "محتاجين ربط كلمات بعيدة عن بعض في التسلسل، خصوصًا في الترجمة أو ملء النصوص الطويلة.",
+        //         "reference": "التطبيقات الأساسية للانتباه: machine translation, seq2seq tasks, speech recognition.",
+        //         "category": ["mechanisms", "basic"],
+        //         "classification": "mechanism",
+        //         "classificationType": "basic"
+        //     }, {
+        //         "id": 2,
+        //         "type": "Self-Attention",
+        //         "description": "Q, K, V مأخوذة من نفس التسلسل (نفس المصدر)، تتيح لكل كلمة أن ترى كل الكلمات الأخرى داخل نفس التسلسل في نفس الوقت.",
+        //         "rnnProblem": "RNN/LSTM بتعالج الكلمات sequential، فبتاخد وقت طويل ومش بتقدر تعمل parallel processing، وكمان صعب عليها تتعامل مع تسلسلات طويلة بسبب vanishing/exploding gradient.",
+        //         "detailedSolution": "Self-Attention بتحسب علاقة كل كلمة مع كل الكلمات الأخرى في نفس التسلسل باستخدام Q, K, V من نفس المصدر. العملية الأساسية تُعرف بـScaled Dot-Product Attention: <span style='color:green; display: block; direction: ltr; text-align: left;'>Attention(Q,K,V) = softmax(QK<sup>T</sup>/√d<sub>k</sub>)V</span>. هنا <span style='color:green; display: inline-block; direction: ltr;'>√d<sub>k</sub></span> بيستخدم لتقليل احتمال gradient explosion. الميزة الرئيسية: كل الكلمات بتُعالَج **متوازيًا (parallel)**، وبتكون النماذج قادرة على الربط بين أي كلمات مهما كانت المسافة بينهم داخل التسلسل. التعقيد: O(n²) بالنسبة لطول التسلسل n.",
+        //         "problem": "محتاجين نفهم علاقات كل الكلمات جوه نفس الجملة أو التسلسل في نفس الوقت، وكمان نقدر نعمل parallel processing لتسلسلات طويلة.",
+        //         "reference": "BERT, GPT, Transformer Encoder, Transformer Decoder",
+        //         "category": ["mechanisms", "basic"],
+        //         "classification": "mechanism",
+        //         "classificationType": "basic"
+        //     }, {
+        //         "id": 3,
+        //         "type": "Multi-Head Attention",
+        //         "description": "عدة نسخ متوازية من Self-Attention تُسقط على أبعاد مختلفة ثم يتم دمجها، بحيث كل رأس (head) يتعلم نوع مختلف من العلاقات بين الكلمات.",
+        //         "rnnProblem": "RNN/LSTM بيتعلم نوع واحد من العلاقات فقط بين الكلمات، ومش بيقدر يركز على أكتر من pattern في نفس الوقت، وده بيحد من القدرة على فهم العلاقات المتعددة (syntax, semantics, position).",
+        //         "detailedSolution": "Multi-Head Attention بيعمل عدة نسخ من Attention (heads) بشكل متوازي، كل واحد بيتعلم نوع مختلف من العلاقات. بعد كده، النواتج بتتجمع عن طريق concat وضربها في مصفوفة وزن W<sup>O</sup>: <span style='color:green; display: block; direction: ltr; text-align: left;'>MultiHead(Q,K,V) = Concat(head₁,...,head<sub>h</sub>)W<sup>O</sup></span> حيث <span style='color:green; display: block; direction: ltr; text-align: left;'>head<sub>i</sub> = Attention(QW<sup>Q</sup><sub>i</sub>, KW<sup>K</sup><sub>i</sub>, VW<sup>V</sup><sub>i</sub>)</span>. كل رأس يلتقط أنماط مختلفة في البيانات (مثلاً التراكيب النحوية، المعاني، الموقع)، مما يزيد من قدرة النموذج على تمثيل العلاقات المعقدة بين الكلمات.",
+        //         "problem": "محتاجين نفهم أكتر من نوع علاقة بين الكلمات في نفس الوقت، سواء معناها أو موقعها أو العلاقة التركيبية.",
+        //         "reference": "Transformer (معيار صناعي)، GPT, BERT",
+        //         "category": ["mechanisms", "basic"],
+        //         "classification": "mechanism",
+        //         "classificationType": "basic"
+        //     }, {
+        //         "id": 4,
+        //         "type": "Cross-Attention",
+        //         "description": "Q مأخوذة من تسلسل (عادة Decoder) وK/V مأخوذة من تسلسل آخر مختلف (عادة Encoder)، لتسمح لكل عنصر في الـDecoder بالنظر لكل عناصر الـEncoder.",
+        //         "rnnProblem": "في Encoder-Decoder RNN/LSTM التقليدي، الـDecoder غالبًا بيعتمد على آخر hidden state فقط من الـEncoder، وبالتالي بينسى معلومات كثيرة من الـinput الأصلي، خصوصًا للجمل الطويلة.",
+        //         "detailedSolution": "Cross-Attention بيحل المشكلة دي عن طريق السماح لكل كلمة في الـDecoder بأنها تاخد Q من hidden state الحالي للـDecoder، وK/V من كل hidden states للـEncoder. العملية: كل كلمة في الـDecoder بتحسب العلاقة مع كل الكلمات في الـEncoder وتختار المعلومات الأكثر أهمية. الصيغة الأساسية: <span style='color:green; display: block; direction: ltr; text-align: left;'>CrossAttn(Q<sub>dec</sub>, K<sub>enc</sub>, V<sub>enc</sub>) = softmax(Q<sub>dec</sub>K<sub>enc</sub><sup>T</sup>/√d<sub>k</sub>) V<sub>enc</sub></span>. ده بيسمح للـDecoder بالوصول لكل المعلومات المهمة من الـEncoder مباشرة.",
+        //         "problem": "نحتاج نربط جملة أو تسلسل بـتسلسل آخر مختلف (مثل الـEncoder-Decoder في الترجمة الآلية أو الـseq2seq tasks).",
+        //         "reference": "Transformer Decoder, T5, BART، الترجمة الآلية، أي نموذج Encoder-Decoder يعتمد على Attention.",
+        //         "category": ["mechanisms", "basic"],
+        //         "classification": "mechanism",
+        //         "classificationType": "basic"
+        //     }
+
+
+        //     ,
+
+
+        //     {
+        //         "id": 5,
+        //         "type": "Causal (Masked) Attention",
+        //         "description": "قناع ثلاثي سفلي (lower triangular mask) يمنع كل كلمة من رؤية الكلمات المستقبلية في نفس التسلسل، مما يضمن توليد نص خطوة خطوة.",
+        //         "rnnProblem": "RNN/LSTM بطبيعته causal، أي كل خطوة تعتمد على السابقة فقط، لكنه بطيء جدًا لأنه بيعالج الكلمات sequential وما بيدعم parallel processing.",
+        //         "detailedSolution": "Causal Attention بيطبق mask مثلثي على الـattention scores قبل الـsoftmax بحيث أي كلمة في position i تشوف فقط positions ≤ i: <span style='color:green; display: block; direction: ltr; text-align: left;'>mask[i,j] = -∞ if j > i</span>. ده يسمح للنموذج بعدم الاطلاع على المستقبل أثناء التدريب أو التوليد، وفي نفس الوقت **يسمح بالـparallel training** على كامل التسلسل بفضل آلية الـSelf-Attention masked.",
+        //         "problem": "محتاجين توليد نص خطوة خطوة (auto-regressive) من غير ما الكلمة الحالية تبص على الكلمات المستقبلية.",
+        //         "reference": "GPT series, LLaMA, Transformer Decoder للنمذجة التوليدية، أي نموذج autoregressive.",
+        //         "category": ["mechanisms", "basic"],
+        //         "classification": "mechanism",
+        //         "classificationType": "basic"
+        //     }, {
+        //         "id": 6,
+        //         "type": "Local / Sliding Window Attention",
+        //         "description": "الانتباه يكون ضمن نافذة محدودة حول كل توكن، بحيث كل كلمة ترى فقط مجموعة محددة من الكلمات القريبة بدل كل التسلسل.",
+        //         "rnnProblem": "RNN/LSTM بيعالج كل التسلسل بالكامل حتى لو المعلومات المهمة قريبة، وده غير فعال خصوصًا للتسلسلات الطويلة (inefficient).",
+        //         "detailedSolution": "في Local / Sliding Window Attention، كل token بيشوف فقط نافذة محددة حوله (مثلاً ±256 tokens). ده يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n×w)</span> حيث w حجم النافذة الثابت، مع الحفاظ على السياق المحلي. يمكن دمجه مع global attention لتغطية الـlong-range dependencies إذا احتجنا، مما يعطي توازن بين الكفاءة والقدرة على التعامل مع التسلسلات الطويلة.",
+        //         "problem": "نحتاج نركز على السياق المحلي بكفاءة عالية، مع تقليل التعقيد الحسابي بالنسبة للتسلسلات الطويلة.",
+        //         "reference": "Longformer (2020), Sparse Transformer, BigBird",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }
+
+        //     , {
+        //         "id": 7,
+        //         "type": "Strided / Dilated Attention",
+        //         "description": "الانتباه يتم عبر خطوات متباعدة (كل k توكن)، بحيث كل كلمة ترى كلمات متباعدة بدلاً من كل التسلسل.",
+        //         "rnnProblem": "RNN/LSTM لازم يمر على كل الـsteps عشان يوصل لمعلومة بعيدة، وده بيضعف gradient ويبطئ التعلم، خصوصًا مع التسلسلات الطويلة.",
+        //         "detailedSolution": "في Strided / Dilated Attention، كل token يشوف فقط كل k tokens (stride = k) بدلاً من كل الكلمات. ده يسمح للنموذج بالوصول للمسافات البعيدة بتكلفة أقل: <span style='color:green; display: inline-block; direction: ltr;'>O(n²/k)</span>. يمكن استخدام عدة strides مختلفة عبر layers متعددة لتعلم multi-scale patterns، بحيث النموذج يلتقط العلاقات القصيرة والطويلة بكفاءة عالية.",
+        //         "problem": "نحتاج الوصول إلى كلمات بعيدة في التسلسل بتكلفة أقل من O(n²)، مع الحفاظ على capture للـlong-range dependencies.",
+        //         "reference": "Sparse Transformer (OpenAI, 2019), Long-Range Transformer",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }
+
+
+        //     , {
+        //         "id": 8,
+        //         "type": "Global Attention",
+        //         "description": "توكنات محددة (special tokens) قادرة على رؤية كل التسلسل بأكمله، والعكس صحيح، بينما باقي التوكنات تعمل Local Attention.",
+        //         "rnnProblem": "RNN/LSTM مفيهوش فكرة global tokens، كل المعلومات لازم تمر عبر الـhidden state المضغوط، وده ممكن يضعف أو ينسى المعلومات الطويلة.",
+        //         "detailedSolution": "في Global Attention، نحدد بعض الـtokens (مثل [CLS] أو أول token في كل paragraph) بحيث تعمل full attention لكل التسلسل، والعكس صحيح: أي كلمة في التسلسل يمكنها التواصل مع هذه الـglobal tokens. ده يجعلها بمثابة global memory متاحة من أي مكان في التسلسل، بينما باقي التوكنات تتعامل ضمن local context فقط، مما يقلل التعقيد الحسابي مقارنة بالـfull attention لكل التوكنات، ويحافظ على القدرة على الوصول إلى معلومات مهمة عبر التسلسل.",
+        //         "problem": "نحتاج أن بعض الـtokens المهمة ترى كل الكلمات في التسلسل والعكس، مثل حالات الـclassification أو summarization.",
+        //         "reference": "Longformer (2020), BigBird (2020), أي نموذج sparse attention يستخدم global tokens.",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }
+
+
+        //     , {
+        //         "id": 9,
+        //         "type": "Random Attention",
+        //         "description": "كل توكن يختار عدد ثابت من التوكنات الأخرى بشكل عشوائي للانتباه إليها، لتوفير تنوع وتغطية إضافية في المعلومات.",
+        //         "rnnProblem": "RNN/LSTM بيتبع نفس المسار دائمًا أثناء معالجة التسلسل، وما بيحتويش على randomness طبيعي، وده ممكن يقلل التعميم ويزيد overfitting للـpatterns المحددة.",
+        //         "detailedSolution": "في Random Attention، كل token يختار r tokens عشوائية للانتباه إليها باستخدام random sampling مع fixed seed لضمان reproducibility. ده بيكسر التماثل بين المسارات المختلفة، يمنع overfitting، ويسمح للمعلومات بالانتشار عبر network عبر مسارات متنوعة. يمكن دمجه مع Local أو Global Attention لتغطية كل التسلسل بكفاءة مع إضافة diversity.",
+        //         "problem": "نحتاج إضافة diversity للانتباه ومنع overfitting للـpatterns المحددة، مع تحسين انتشار المعلومات عبر الشبكة.",
+        //         "reference": "BigBird (2020), Sparse Transformer, أي نموذج Sparse Attention يستخدم random connections.",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }
+
+
+        //     , {
+        //         "id": 10,
+        //         "type": "Block / Chunked Attention",
+        //         "description": "تقسيم التسلسل إلى كتل (blocks) والانتباه داخل كل block وبين الكتل المجاورة، لتقليل التعقيد مع الحفاظ على السياق المحلي والمتجاور.",
+        //         "rnnProblem": "RNN/LSTM بيعالج التسلسل كله خطوة خطوة، وده بيصعب التعامل مع sequences طويلة جدًا ويزيد الوقت اللازم للحساب.",
+        //         "detailedSolution": "في Block / Chunked Attention، نقسم الـsequence إلى blocks (مثلاً كل block = 64 tokens). نقوم بعمل attention داخل كل block بالإضافة إلى attention بين blocks المجاورة لضمان continuity. هذا يقلل التعقيد من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n²/b)</span> حيث b حجم block. يمكن استخدام blocks متداخلة (overlapping) لضمان عدم فقدان السياق عند الحدود بين blocks.",
+        //         "problem": "نحتاج معالجة sequences طويلة بكفاءة عن طريق تقسيمها إلى كتل مع الحفاظ على الربط بين الكلمات المتجاورة.",
+        //         "reference": "BigBird (2020), Block-Sparse Attention, Long-Range Transformers",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }
+
+
+        //     , {
+        //         "id": 11,
+        //         "type": "Fixed Patterns Attention",
+        //         "description": "استخدام أنماط انتباه ثابتة محددة مسبقًا (مثل الصفوف، الأعمدة، أو الأقطار) لاستغلال البنية الطبيعية للبيانات المنظمة هندسياً.",
+        //         "rnnProblem": "RNN/LSTM مش قادر يستفيد من البنية الهندسية للبيانات (مثل الصور 2D أو الجداول)، لأنه يعالج التسلسل بشكل linear فقط ويضيع المعلومات الهيكلية.",
+        //         "detailedSolution": "في Fixed Patterns Attention، نحدد patterns محددة مسبقًا مثل: \n- row attention: كل عنصر يشوف العناصر في نفس الصف\n- column attention: كل عنصر يشوف العناصر في نفس العمود\n- diagonal attention: كل عنصر يشوف العناصر على القطر\nهذه الأنماط تستغل البنية الطبيعية للبيانات المنظمة، وتقلل التعقيد الحسابي بشكل كبير مقارنة بالـfull attention لجميع العناصر، مع الحفاظ على المعلومات الهيكلية المهمة.",
+        //         "problem": "نحتاج استخدام patterns ثابتة محددة مسبقًا لتقليل التعقيد الحسابي (sparsity) والاستفادة من البنية الهندسية للبيانات.",
+        //         "reference": "Sparse Transformer (OpenAI, 2019), Long-Range Sparse Transformers",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }, {
+        //         "id": 12,
+        //         "type": "Sparse Top-K Attention",
+        //         "description": "كل token يركز على أعلى K قيم من attention scores فقط بشكل ديناميكي، مما يقلل الحسابات ويركز على العناصر الأهم.",
+        //         "rnnProblem": "RNN/LSTM بيدي نفس الاهتمام لكل الـsteps، ومش بيركز على أهم العناصر في التسلسل، مما يقلل الكفاءة خصوصًا للتسلسلات الطويلة.",
+        //         "detailedSolution": "في Sparse Top-K Attention، نحسب كل attention scores أولاً، ثم نأخذ فقط أعلى K قيم ونضع باقي القيم = 0 قبل تطبيق softmax. هذا يسمح للنموذج بالتركيز على أهم K tokens بشكل adaptive حسب محتوى التسلسل. ⚠️ للـbackward pass، يمكن استخدام straight-through estimator أو softmax مع temperature للحفاظ على differentiability أثناء التدريب.",
+        //         "problem": "نحتاج تقليل الحسابات على التسلسل الطويل والتركيز فقط على أهم الكلمات أو العناصر في الـsequence.",
+        //         "reference": "Top-K Sparse Attention (Adaptive Sparsity), Long-Range Transformers",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }, {
+        //         "id": 13,
+        //         "type": "LSH (Locality Sensitive Hashing) Attention",
+        //         "description": "تقريب التشابه بين التوكنات عبر hashing لتجميع التوكنات المتشابهة معًا، بحيث يتم عمل attention فقط ضمن التوكنات المتشابهة.",
+        //         "rnnProblem": "RNN/LSTM لازم يعالج كل التسلسل خطوة خطوة، حتى لو فيه tokens متشابهة يمكن تجميعهم، مما يزيد الوقت والتعقيد الحسابي مع التسلسلات الطويلة.",
+        //         "detailedSolution": "في LSH Attention، نستخدم Locality Sensitive Hashing لتحويل الـqueries والـkeys إلى hash buckets. التوكنات التي تقع في نفس الـbucket أو في buckets مجاورة تقوم بعمل attention مع بعضها فقط. هذا يقلل التعقيد الحسابي من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(n log n)</span> في المتوسط، مع الحفاظ على قدرة النموذج على التركيز على التوكنات المتشابهة بشكل فعال.",
+        //         "problem": "نحتاج العثور على التوكنات المتشابهة بسرعة والعمل عليها فقط، لتسريع الانتباه في التسلسلات الطويلة.",
+        //         "reference": "Reformer (Kitaev et al., 2020), Long-Range Transformers",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }, {
+        //         "id": 14,
+        //         "type": "Clustering-Based Attention",
+        //         "description": "تجميع التوكنات المتشابهة معًا (semantically) والانتباه داخل كل مجموعة (cluster) لتقليل الحسابات مع الحفاظ على تمثيل العلاقات المهمة.",
+        //         "rnnProblem": "RNN/LSTM مش قادر يجمع tokens متشابهة semantically، لأنه يعالج التسلسل خطوة خطوة وما بيستفيد من البنية الدلالية بين الكلمات.",
+        //         "detailedSolution": "في Clustering-Based Attention، نستخدم soft clustering على keys/queries باستخدام learnable cluster centers. كل cluster يعمل attention داخليًا (internal attention)، ويمكن إضافة cross-cluster attention محدود إذا احتجنا لربط المعلومات بين المجموعات. soft assignment يُنفذ عادةً باستخدام Gumbel-Softmax أو تقنيات مشابهة لضمان differentiability أثناء التدريب، بدل hard K-means assignment. هذا يقلل التعقيد الحسابي ويعطي قدرة النموذج على التركيز على التوكنات المتشابهة semantically.",
+        //         "problem": "نحتاج تجميع tokens متشابهة semantically والانتباه داخل كل مجموعة لتقليل الحسابات وتحسين التعلم.",
+        //         "reference": "Clustered Attention, Routing Transformers (2020), Long-Range Transformers",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }, {
+        //         "id": 15,
+        //         "type": "Axial Attention",
+        //         "description": "انتباه يُطبق على كل بعد من أبعاد البيانات بشكل منفصل، لاستغلال البنية متعددة الأبعاد دون زيادة كبيرة في التعقيد الحسابي.",
+        //         "rnnProblem": "RNN/LSTM مش مصمم للتعامل مع البيانات متعددة الأبعاد، عادة بيحولها إلى 1D sequence وبالتالي بيضيع البنية المكانية أو الزمنية للبيانات.",
+        //         "detailedSolution": "في Axial Attention، نطبق الانتباه على كل بعد من أبعاد البيانات بشكل منفصل. مثال للصور (H×W): بدل عمل attention على كل الـpixels مرة واحدة (O(H²W²))، نقوم أولاً بالـattention على كل row (O(HW²)) ثم على كل column (O(H²W)). بذلك يصبح التعقيد الكلي <span style='color:green; display: inline-block; direction: ltr;'>O(HW(H+W))</span> بدل O(H²W²). نفس الفكرة يمكن تطبيقها على بيانات 3D (مثل الفيديو) بحيث نطبق attention على time×height×width بشكل منفصل لكل بعد.",
+        //         "problem": "نحتاج معالجة بيانات متعددة الأبعاد (صور، فيديو، أو أي tensor عالي الأبعاد) بكفاءة مع الحفاظ على العلاقات المكانية أو الزمنية.",
+        //         "reference": "Axial Transformer (Ho et al., 2019), Axial-DeepLab",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     }, {
+        //         "id": 16,
+        //         "type": "Hierarchical Attention",
+        //         "description": "انتباه متعدد المستويات (coarse-to-fine) يسمح للنموذج بالتركيز على السياق العالمي والجزئيات المحلية في نفس الوقت.",
+        //         "rnnProblem": "RNN/LSTM بيعالج كل tokens بنفس المستوى، وما بيقدرش يمثل hierarchy أو مستويات مختلفة من التجريد داخل النص أو البيانات الطويلة.",
+        //         "detailedSolution": "في Hierarchical Attention، نقسم البيانات أو النصوص إلى مستويات: \n- أول مستوى: chunks كبيرة (document-level) لتحديد السياق العام.\n- ثاني مستوى: paragraphs لتحديد السياق المتوسط.\n- ثالث مستوى: sentences أو tokens لتحديد التفاصيل الدقيقة.\nبهذا الشكل، يمكن للنموذج رؤية الـglobal context والـlocal details في نفس الوقت باستخدام بنية هرمية، مما يحسن القدرة على تمثيل المعلومات الطويلة والمعقدة.",
+        //         "problem": "نحتاج أن يكون الانتباه على مستويات مختلفة من التجريد، بحيث نستفيد من السياق العالمي والجزئيات المحلية معًا.",
+        //         "reference": "Hierarchical Attention Networks (Yang et al., 2016), multi-level attention models",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     }
+
+
+        //     , {
+        //         "id": 17,
+        //         "type": "Learnable Sparse Patterns",
+        //         "description": "تعلم أنماط التناثر (sparsity) أثناء التدريب بطريقة قابلة للاشتقاق، بحيث يقرر النموذج بنفسه أي الـconnections يجب أن تكون فعالة وأيها تُعطَّل.",
+        //         "rnnProblem": "RNN/LSTM مش sparse بطبيعته، بيعالج كل العناصر في التسلسل بنفس الطريقة ولا يميز بين المهم وغير المهم، مما يزيد التعقيد الحسابي ويحد من الكفاءة.",
+        //         "detailedSolution": "في Learnable Sparse Patterns، نضيف learnable mask parameters على مصفوفة الـattention. خلال التدريب، الـmask يتعلم أن يجعل بعض الـconnections = 0 لتقليل التعقيد والتركيز على العلاقات المهمة. يتم استخدام Gumbel-Softmax أو Concrete distribution لضمان differentiability، ويمكن إضافة L0 regularization لتشجيع sparsity. بهذه الطريقة، الـsparsity pattern نفسه يتعلم من البيانات بطريقة adaptive وفعالة.",
+        //         "problem": "نحتاج أن يتعلم النموذج نفسه أنماط sparsity المناسبة من البيانات، بدل تحديدها يدوياً.",
+        //         "reference": "Dynamic Sparse Attention, Differentiable Masking, Learnable Sparse Transformers",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "sparse"
+        //     }
+
+
+        //     , {
+        //         "id": 18,
+        //         "type": "Linear Attention",
+        //         "description": "استخدام Kernel Trick لتحويل التعقيد الحسابي من O(n²) إلى خطي O(n)، مع الحفاظ على القدرة على parallel processing.",
+        //         "rnnProblem": "RNN/LSTM خطي O(n) لكن sequential، بينما Self-Attention التقليدي O(n²) لكنه parallelizable، لذلك نحتاج مزيج من كفاءة الـRNN وخواص الـAttention.",
+        //         "detailedSolution": "في Linear Attention، نستخدم kernel trick: <span style='color:green; display: block; direction: ltr; text-align: left;'>φ(Q)(φ(K)<sup>T</sup>V)</span> بدل <span style='color:green; display: block; direction: ltr; text-align: left;'>(QK<sup>T</sup>)V</span>. أولاً نحسب (φ(K)<sup>T</sup>V) بتعقيد O(nd²)، ثم نضرب φ(Q) في النتيجة O(nd²). بالتالي يصبح التعقيد الكلي <span style='color:green; display: inline-block; direction: ltr;'>O(nd²) ≈ O(n)</span> للـd ثابت، مع إمكانية parallel processing على كامل التسلسل، مما يجمع بين السرعة والكفاءة الحسابية.",
+        //         "problem": "نحتاج تقليل التعقيد من O(n²) إلى O(n) مع الاحتفاظ بالقدرة على parallel processing في تسلسلات طويلة.",
+        //         "reference": "Linear Transformer (Katharopoulos et al., 2020), Kernel-based Attention, Efficient Transformers",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     },
+
+        //     {
+        //         "id": 19,
+        //         "type": "Performer Attention",
+        //         "description": "تقريب Self-Attention باستخدام Random Feature Mapping (FAVOR+) لتقليل التعقيد الحسابي مع الحفاظ على دقة عالية.",
+        //         "rnnProblem": "RNN/LSTM تواجه نفس المشكلة: sequential processing أو Self-Attention التقليدي O(n²)، مما يصعب التعامل مع sequences طويلة جدًا.",
+        //         "detailedSolution": "في Performer Attention، نستخدم random Fourier features عبر FAVOR+ algorithm لتقريب softmax kernel: <span style='color:green; display: block; direction: ltr; text-align: left;'>softmax(QK<sup>T</sup>/√d) ≈ φ(Q)φ(K)<sup>T</sup></span> حيث φ هي positive random features. هذا يسمح بحساب attention بتعقيد O(n) بدل O(n²)، مع الحفاظ على unbiased approximation للـsoftmax attention، وبالتالي يمكن التعامل مع sequences طويلة جدًا بكفاءة عالية.",
+        //         "problem": "نحتاج scalable Self-Attention لتسلسلات طويلة جدًا مع الحفاظ على دقة الـsoftmax التقليدية.",
+        //         "reference": "Performer (Choromanski et al., 2021), FAVOR+ algorithm, Efficient Transformers",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     },
+
+
+
+        //     {
+        //         "id": 20,
+        //         "type": "Relative Positional Attention",
+        //         "description": "إضافة تحيز يعتمد على المسافة النسبية بين التوكنات، بحيث يتمكن النموذج من التعلم بناءً على المسافة بين الكلمات بدل الـabsolute positions فقط.",
+        //         "rnnProblem": "RNN/LSTM عنده معلومات positional ضمنية لأنه sequential، لكن مع مرور الوقت (long sequences) هذه المعلومات بتضعف أو تُنسى، خصوصًا للسياق الطويل.",
+        //         "detailedSolution": "في Relative Positional Attention، بدل استخدام absolute position embeddings، نضيف bias على attention scores حسب المسافة النسبية بين التوكنات (i-j): <span style='color:green; display: block; direction: ltr; text-align: left;'>score<sub>ij</sub> = q<sub>i</sub>·k<sub>j</sub> + q<sub>i</sub>·r<sub>(i-j)</sub></span> حيث r هو تمثيل learnable للمسافة النسبية. هذا يسمح للنموذج بتعلم patterns تعتمد على المسافة النسبية بين الكلمات وليس على الموضع المطلق فقط، مما يحسن generalization على sequences طويلة ويعزز فهم التسلسل.",
+        //         "problem": "نحتاج تمثيل الترتيب النسبي للكلمات بشكل أفضل من absolute positions، خصوصًا للتسلسلات الطويلة.",
+        //         "reference": "Transformer-XL (Dai et al., 2019), T5, relative positional embeddings in Transformers",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     }
+
+
+        //     ,
+
+        //     {
+        //         "id": 21,
+        //         "type": "Sparsemax Attention",
+        //         "description": "بديل للـSoftmax يولد توزيع attention متناثر يحتوي على أصفار حقيقية، بحيث يركز النموذج على أهم التوكنات فقط.",
+        //         "rnnProblem": "في حال استخدام RNN attention، عادة يُستخدم Softmax الذي يعطي probabilities > 0 لكل عنصر، حتى غير المهم، مما يجعل التركيز أقل وضوحًا ويقلل interpretability.",
+        //         "detailedSolution": "Sparsemax يقوم بعمل Euclidean projection على simplex مشابه لـSoftmax، لكنه ينتج output متناثر (sparse) يحتوي على exact zeros. هذا يعني أن النموذج يركز فقط على أهم tokens ويضع الـattention على الباقي = 0 فعلًا، وليس مجرد قيمة صغيرة. ⚠️ الحسابات أبطأ من Softmax التقليدي، لكن يعطي interpretability أعلى ويسمح بتحديد الكلمات الأكثر أهمية بوضوح.",
+        //         "problem": "نحتاج اختيار أهم الكلمات فقط في التسلسل والتجاهل الصريح للباقي، لتحسين interpretability والفعالية الحسابية.",
+        //         "reference": "Sparsemax (Martins & Astudillo, 2016), Sparse Attention Mechanisms",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     },
+
+
+
+
+
+        //     {
+        //         "id": 22,
+        //         "type": "Grouped Query Attention (GQA)",
+        //         "description": "مشاركة K/V بين مجموعات من الـqueries، كحل وسط بين Multi-Head Attention التقليدي (MHA) وMulti-Query Attention (MQA)، لتقليل الذاكرة والحسابات.",
+        //         "rnnProblem": "مش مشكلة في RNN، ده optimization خاص بالـMulti-Head Attention في Transformers لتقليل الذاكرة والـcompute.",
+        //         "detailedSolution": "في GQA، بدل أن يكون لكل head K,V منفصل (MHA) أو كل الـheads يشاركوا نفس K,V (MQA)، نقسم الـheads إلى مجموعات وكل مجموعة تشارك نفس K,V. مثال: 32 heads و4 groups → 8 K/V pairs بدل 32، ما يوفر حوالي 70% من الذاكرة في KV cache مع الحفاظ على جودة الأداء قريبة جدًا من MHA. هذا يقلل بشكل كبير memory footprint وcompute مع الحفاظ على القدرة على parallel processing لكل head group.",
+        //         "problem": "نحتاج تقليل استهلاك الذاكرة والحسابات في Multi-Head Attention مع الحفاظ على جودة الأداء.",
+        //         "reference": "GQA (Ainslie et al., 2023), Llama 2, Mistral, Efficient Multi-Head Attention",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     }
+
+        //     ,
+
+
+        //     {
+        //         "id": 23,
+        //         "type": "Cross-Attention with Latents (Perceiver)",
+        //         "description": "ضغط التسلسل الطويل لعدد صغير من latent tokens ثم تطبيق attention عليهم، لتقليل التعقيد الحسابي مع الحفاظ على المعلومات المهمة.",
+        //         "rnnProblem": "RNN/LSTM بيضغط كل الـsequence في hidden state واحد فقط، مما يؤدي لفقدان كمية كبيرة من المعلومات عند sequences طويلة جدًا.",
+        //         "detailedSolution": "في Perceiver، نستخدم cross-attention لضغط sequence طويل (n tokens) إلى عدد صغير من latent tokens (m << n). بعد ذلك، نقوم بعمل self-attention فقط على الـlatents، ثم cross-attention لإرجاع المعلومات للـsequence الأصلي إذا لزم الأمر. هذا يقلل التعقيد الحسابي من O(n²) إلى <span style='color:green; display: inline-block; direction: ltr;'>O(nm + m²)</span>. مثال: n=100,000 وm=512 → توفير هائل في الحسابات والذاكرة مع الحفاظ على دقة التمثيل.",
+        //         "problem": "نحتاج ضغط sequences طويلة جدًا إلى تمثيل compact وefficient دون فقدان المعلومات المهمة.",
+        //         "reference": "Perceiver, Perceiver IO (Jaegle et al., 2021), Efficient Attention for Long Sequences",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     }, {
+        //         "id": 24,
+        //         "type": "RoPE (Rotary Position Embedding)",
+        //         "description": "تمثيل الموضع عبر تدوير الـQ وK في الفضاء المركب بحيث تعتمد الـattention على المسافة النسبية بشكل طبيعي.",
+        //         "rnnProblem": "RNN/LSTM عنده positional info ضمنية لأنه sequential، لكنها تضيع مع التسلسلات الطويلة، بينما learned absolute embeddings غير قابلة للتعميم (extrapolation) إلى sequences أطول من التدريب.",
+        //         "detailedSolution": "في RoPE، نطبق rotation matrix على Q وK وفقًا للموضع: <span style='color:green; display: block; direction: ltr; text-align: left;'>f(x,m) = x·e<sup>imθ</sup></span> في الفضاء المركب. نتيجة ذلك، الـinner product بين Q وK يعكس المسافة النسبية بين التوكنات بشكل طبيعي. المميزات: \n- يدعم extrapolation لتسلسلات أطول من التدريب\n- لا يحتاج parameters إضافية\n- يحقق natural decay مع زيادة المسافة بين التوكنات\n- يحافظ على قدرة النموذج على التعامل مع sequences طويلة بكفاءة",
+        //         "problem": "نحتاج position encoding يعمل مع sequences أطول من التي تم تدريب النموذج عليها دون فقدان المعلومات.",
+        //         "reference": "RoFormer (Su et al., 2021), LLaMA, GPT-NeoX, Rotary Position Embeddings",
+        //         "category": ["mechanisms", "positional"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     },
+
+        //     {
+        //         "id": 25,
+        //         "type": "ALiBi (Attention with Linear Biases)",
+        //         "description": "إضافة bias خطي بسيط على attention scores حسب المسافة بين التوكنات، بدون استخدام position embeddings تقليدية.",
+        //         "rnnProblem": "Position embeddings التقليدية تضيف parameters جديدة وصعب extrapolation لتسلسلات أطول من التدريب، بينما RNN لديها معلومات موضعية ضمنية لكنها تضيع مع الـtime.",
+        //         "detailedSolution": "في ALiBi، بدل position embeddings، نضيف bias خطي لكل pair من التوكنات: <span style='color:green; display: block; direction: ltr; text-align: left;'>score<sub>ij</sub> = q<sub>i</sub>·k<sub>j</sub> - m·|i-j|</span> حيث m هو slope مختلف لكل head. هذا يتيح: \n- عدم الحاجة لأي parameters إضافية\n- دعم extrapolation ممتاز لتسلسلات أطول بكثير من التدريب\n- الحفاظ على simplicity وسرعة الحسابات\nيعمل bias الخطي على تفضيل الانتباه للكلمات الأقرب نسبيًا، مما يحسن generalization دون زيادة حجم النموذج.",
+        //         "problem": "نحتاج position encoding بسيط جداً، سريع، وقابل للتوسع لتسلسلات أطول من التدريب.",
+        //         "reference": "ALiBi (Press et al., 2022), BLOOM, MPT, Linear Biases for Transformers",
+        //         "category": ["mechanisms", "positional"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     },
+
+
+        //     {
+        //         "id": 26,
+        //         "type": "Multi-Query Attention (MQA)",
+        //         "description": "جميع الـheads تشارك نفس K وV، وهي حالة خاصة من GQA، لتقليل استهلاك الذاكرة وتسريع inference.",
+        //         "rnnProblem": "مش مشكلة في RNN، هذا optimization خاص بالـMulti-Head Attention لتقليل KV cache memory أثناء inference.",
+        //         "detailedSolution": "في MQA، بدل أن يكون لكل head K,V منفصل، كل الـheads تشترك في single K,V pair واحد. هذا يوفر memory كبير في KV cache (~95%) ويسرع inference بشكل ملحوظ. العيب أنه قد يكون هناك تراجع طفيف في الجودة مقارنة بـMHA، لكن يمكن تعويض ذلك بزيادة dimensionality للـK (d<sub>k</sub>) إذا لزم الأمر. مناسب جدًا للنماذج الكبيرة عند الحاجة إلى decoding سريع على sequences طويلة.",
+        //         "problem": "نحتاج تقليل KV cache memory بشكل كبير لتسريع inference على sequences طويلة.",
+        //         "reference": "Fast Transformer Decoding (Shazeer, 2019), PaLM, Efficient Transformer Decoding",
+        //         "category": ["mechanisms"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     },
+
+
+
+
+        //     {
+        //         "id": 27,
+        //         "type": "Sliding Window + RoPE (Extended Context)",
+        //         "description": "دمج sliding window attention مع RoPE للـpositional encoding، لدعم context طويل جدًا بكفاءة عالية.",
+        //         "rnnProblem": "RNN/LSTM محدود في long context memory، لأنه يعتمد على hidden state متراكم sequentially ويصعب عليه الاحتفاظ بسياق طويل جدًا.",
+        //         "detailedSolution": "في هذا الأسلوب، نستخدم sliding window attention (مثلاً 4096 tokens) بحيث كل token يركز فقط على tokens محلية ضمن النافذة، مع تطبيق RoPE على Q وK لتضمين positional information بشكل يمكن تعميمه على تسلسلات أطول. يمكن أيضًا إضافة global attention tokens لتغطية أهم العناصر عبر كل السياق. هذا يتيح التعامل مع contexts طويلة جدًا (100k+ tokens) بكفاءة عالية، مع الحفاظ على فهم محلي (local) وعالمي (global).",
+        //         "problem": "نحتاج context window طويل جدًا مع الحفاظ على الكفاءة الحسابية وفهم local وglobal patterns.",
+        //         "reference": "Mistral 7B (sliding window), Longformer patterns, Extended Context Transformers",
+        //         "category": ["mechanisms", "sparse"],
+        //         "classification": "mechanism",
+        //         "classificationType": "advanced"
+        //     }
+
+
+
+
+        // ];
 
         // البيانات: التحسينات التنفيذية والمعماريات (5 أنواع)
         const attentionOptimizations = [{
